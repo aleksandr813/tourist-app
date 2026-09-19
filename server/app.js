@@ -16,6 +16,8 @@ const router = new Router({ exampleManager });
 app.use(express.static(`${__dirname}/public`));
 app.use('/', router);
 
+console.log();
+
 function deinit() {
     db.destrucor();
     setTimeout(() =>process.exit(), 500);
