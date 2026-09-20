@@ -4,7 +4,7 @@ townList: {
     MOSCOW: 'Москва',
 },
 
-HOST: "localhost:3003"
+HOST: "http://localhost:3003"
 
 }
 

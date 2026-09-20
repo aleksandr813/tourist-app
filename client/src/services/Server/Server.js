@@ -9,21 +9,19 @@ export default class Server {
         this.store = store;
     }
 
-    async request(method, params) {
+    async request(method, params = {}) {
         try {
-            //params.method = method;
-
-            const url = `${HOST}/${Object.keys(params).map(key => `${key}=${params[key]}`).join('/')}`;
-            console.log(111);
-
+            const query = Object.keys(params)
+                .map(key => `${key}=${encodeURIComponent(params[key])}`)
+                .join('&');
+            const url = `${HOST}/${method}${query ? '?' + query : ''}`;
+            console.log(url);
             const response = await fetch(url);
             const answer = await response.json();
-
 
             if (answer.result === 'ok' && answer.data) {
                 return answer.data;
             }
-
             return null;
         } catch (e) {
             console.log('Request exception:', e);
