@@ -4,12 +4,14 @@ const CONFIG = require('./config');
 const Router = require('./application/router/Router');
 const DB = require('./application/modules/db/DB');
 const Mediator = require('./application/modules/Mediator/Mediator');
+const ExampleManager = require('./application/modules/example/ExampleManager');
+
 const { NAME, PORT, DATABASE } = CONFIG;
 
 const db = new DB({ DATABASE });
 const mediator = new Mediator(CONFIG.MEDIATOR);
 
-new exampleManager();
+const exampleManager = new ExampleManager({mediator, db});
 
 const router = new Router({ exampleManager });
 

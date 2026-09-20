@@ -1,5 +1,7 @@
 class BaseManager {
-    constructor (mediator, db) {
+    constructor (params) {
+        const { mediator, db } = params;
+
         this.mediator = mediator;
         this.db = db;
 
