@@ -7,10 +7,6 @@ class DB {
         this.orm = new ORM(this.db);
     }
 
-    async getCities() {
-        return await this.orm.all('cities');
-    }
-
     destructor() {
         this.db.close();
     }
