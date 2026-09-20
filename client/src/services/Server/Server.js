@@ -28,7 +28,7 @@ export default class Server {
     }
 
     async getCitiesList(){
-        const response = await this.request('getCitiesList');
+        const response = await this.request('getCities');
         if (!response) {
             return null;
         }
