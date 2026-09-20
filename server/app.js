@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const CONFIG = require('./config');
 const Router = require('./application/router/Router');
+const Answer = require('./application/Answer');
 const DB = require('./application/modules/db/DB');
 const Mediator = require('./application/modules/Mediator/Mediator');
 const ExampleManager = require('./application/modules/example/ExampleManager');
@@ -10,10 +11,11 @@ const { NAME, PORT, DATABASE } = CONFIG;
 
 const db = new DB({ DATABASE });
 const mediator = new Mediator(CONFIG.MEDIATOR);
+const answer = new Answer();
 
-const exampleManager = new ExampleManager({mediator, db});
+new ExampleManager({ mediator, db });
 
-const router = new Router({ exampleManager });
+const router = new Router({ mediator, answer });
 
 app.use(express.static(`${__dirname}/public`));
 app.use('/', router);
