@@ -8,8 +8,7 @@ class ExampleManager extends BaseManager{
     }
     async triggerGetCities()
     {
-        const cities = await this.db.getCities()
-        
+       return await this.db.getCities();
     }
 }
 

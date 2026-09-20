@@ -4,7 +4,6 @@ const router = express.Router();
 const {
     notFoundHandler,
     useChooseCityHandler,
-    useGetCitiesHandler
 } = require('./handlers');
 const useGetCitiesHandler = require('./handlers/useGetCitiesHandler');
 
