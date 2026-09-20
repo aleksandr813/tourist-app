@@ -12,7 +12,8 @@ const CONFIG = {
             SELECT_CITY: 'SELECT_CITY',
         },
         TRIGGERS: {
-            EXAMPLE_TRIGGER: 'EXAMPLE TRIGGER',
+            EXAMPLE_TRIGGER: 'EXAMPLE_TRIGGER',
+            GET_CITIES: 'GET_CITIES',
         },
     },
 }
