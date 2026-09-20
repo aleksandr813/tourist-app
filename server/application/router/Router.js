@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 const {
-    useRegistrationHandler,
     notFoundHandler,
     useLoginHandler,
     useUpdateChatHandler,
@@ -10,7 +9,6 @@ const {
 } = require('./handlers');
 
 function Router({ mediator }) {
-    router.get('/reg/:username/:password', useRegistrationHandler(exampleManager));
     router.all('/*path', notFoundHandler);
     return router;
 }
