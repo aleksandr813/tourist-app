@@ -9,7 +9,7 @@ const {
     useSendMessageHandler,
 } = require('./handlers');
 
-function Router({ exampleManager }) {
+function Router({ mediator }) {
     router.get('/reg/:username/:password', useRegistrationHandler(exampleManager));
     router.all('/*path', notFoundHandler);
     return router;
