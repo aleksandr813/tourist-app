@@ -1,4 +1,7 @@
+import CONFIG from "../../Config";
 import Store from "../Store";
+
+const {HOST} = CONFIG;
 
 export default class Server {   
 
@@ -10,8 +13,8 @@ export default class Server {
         try {
             //params.method = method;
 
-            const url = `${this.HOST}/${Object.keys(params).map(key => `${key}=${params[key]}`).join('/')}`;
-            console.log(url);
+            const url = `${HOST}/${Object.keys(params).map(key => `${key}=${params[key]}`).join('/')}`;
+            console.log(111);
 
             const response = await fetch(url);
             const answer = await response.json();

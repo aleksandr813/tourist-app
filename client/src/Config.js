@@ -2,7 +2,9 @@ const CONFIG = {
 
 townList: {
     MOSCOW: 'Москва',
-}
+},
+
+HOST: "localhost:3003"
 
 }
 
