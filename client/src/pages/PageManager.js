@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import StartPage from './StartPage/StartPage';
+import RoutesPage from './RoutesPage/RoutesPage';
 
 export const PAGES = {
     START: 'START',
-    JOPA: 'JOPA'
+    ROUTES: 'ROUTES'
 };
 
 const PageManager = () => {
-    const [page, setPage] = useState(PAGES.START);
+    const [page, setPage] = useState(PAGES.ROUTES);
 
     const props = {
         setPage,
@@ -17,6 +18,7 @@ const PageManager = () => {
     return (
         <>
             {page === PAGES.START && <StartPage {...props} />}
+            {page === PAGES.ROUTES && <RoutesPage {...props} />}
         </>
     );
 };
