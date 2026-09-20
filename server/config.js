@@ -10,8 +10,10 @@ const CONFIG = {
         EVENTS: {
             EXAMPLE_EVENT: 'EXAMPLE_EVENT',
             SELECT_CITY: 'SELECT_CITY',
+            
         },
         TRIGGERS: {
+            GET_CITIES: 'GET_CITIES',
             EXAMPLE_TRIGGER: 'EXAMPLE TRIGGER',
         },
     },
