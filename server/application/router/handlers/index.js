@@ -1,7 +1,8 @@
-const useRegistrationHandler = require("./useRegistrationHandler");
+const useChooseCityHandler = require("./useChooseCityHandler");
 const notFoundHandler = require("./notFoundHandler");
 
 module.exports = {
     notFoundHandler,
-    useRegistrationHandler,
+    useChooseCityHandler,
+
 };

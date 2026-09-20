@@ -3,12 +3,11 @@ const router = express.Router();
 
 const {
     notFoundHandler,
-    useLoginHandler,
-    useUpdateChatHandler,
-    useSendMessageHandler,
+    chooseCityHandler,
 } = require('./handlers');
 
 function Router({ mediator }) {
+    router.get('/chooseCity/:city', )
     router.all('/*path', notFoundHandler);
     return router;
 }
