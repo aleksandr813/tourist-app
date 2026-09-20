@@ -2,15 +2,12 @@ const express = require('express');
 const router = express.Router();
 
 const {
-    useRegistrationHandler,
     notFoundHandler,
-    useLoginHandler,
-    useUpdateChatHandler,
-    useSendMessageHandler,
+    useChooseCityHandler,
 } = require('./handlers');
 
-function Router({ mediator }) {
-    router.get('/reg/:username/:password', useRegistrationHandler(exampleManager));
+function Router({ mediator, answer }) {
+    router.get('/chooseCity/:city', useChooseCityHandler(mediator,answer) );
     router.all('/*path', notFoundHandler);
     return router;
 }

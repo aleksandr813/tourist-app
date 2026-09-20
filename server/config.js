@@ -9,6 +9,7 @@ const CONFIG = {
     MEDIATOR: {
         EVENTS: {
             EXAMPLE_EVENT: 'EXAMPLE_EVENT',
+            SELECT_CITY: 'SELECT_CITY',
         },
         TRIGGERS: {
             EXAMPLE_TRIGGER: 'EXAMPLE TRIGGER',
