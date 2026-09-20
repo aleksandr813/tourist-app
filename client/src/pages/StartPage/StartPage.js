@@ -23,6 +23,11 @@ export default function StartPage({setPage, PAGES}){
     }
 
     useEffect(() => {
+        async function getCities(){
+            const citiesList = await server.getCitiesList();
+            console.log(citiesList);
+            setCitiesList(citiesList);
+        }
         getCities();
     },[])
 

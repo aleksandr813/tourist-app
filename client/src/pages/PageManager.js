@@ -8,7 +8,7 @@ export const PAGES = {
 };
 
 const PageManager = () => {
-    const [page, setPage] = useState(PAGES.ROUTES);
+    const [page, setPage] = useState(PAGES.START);
 
     const props = {
         setPage,

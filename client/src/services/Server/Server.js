@@ -8,9 +8,10 @@ export default class Server {
 
     async request(method, params) {
         try {
-            params.method = method;
+            //params.method = method;
 
-            const url = `${this.HOST}/?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
+            const url = `${this.HOST}/${Object.keys(params).map(key => `${key}=${params[key]}`).join('/')}`;
+            console.log(url);
 
             const response = await fetch(url);
             const answer = await response.json();
@@ -28,7 +29,8 @@ export default class Server {
     }
 
     async getCitiesList(){
-        const response = await this.request('getCities');
+        console.log("OBAMA");
+        const response = await this.request('getCities');   
         if (!response) {
             return null;
         }
