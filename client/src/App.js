@@ -1,15 +1,14 @@
 import logo from './logo.svg';
 import './App.css';
+import StartPage from './pages/StartPage/StartPage';
+import PageManager from './pages/PageManager';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-      </header>
+      <div className='app'>
+         <PageManager/>
+      </div>
     </div>
   );
 }
