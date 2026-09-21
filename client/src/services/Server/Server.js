@@ -1,4 +1,5 @@
 import Store from "../Store";
+import CONFIG from "../../Config"
 
 export default class Server {   
 
@@ -6,12 +7,10 @@ export default class Server {
         this.store = store;
     }
 
-    async request(method, params) {
+    async request(method, params={}) {
         try {
-            //params.method = method;
 
-            const url = `${this.HOST}/${Object.keys(params).map(key => `${key}=${params[key]}`).join('/')}`;
-            console.log(url);
+            const url = `${CONFIG.HOST}/${method}/${Object.keys(params).map(key => `${key}=${params[key]}`).join('/')}`;
 
             const response = await fetch(url);
             const answer = await response.json();
@@ -29,7 +28,6 @@ export default class Server {
     }
 
     async getCitiesList(){
-        console.log("OBAMA");
         const response = await this.request('getCities');   
         if (!response) {
             return null;
