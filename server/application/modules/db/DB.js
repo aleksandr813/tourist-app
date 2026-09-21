@@ -7,10 +7,14 @@ class DB {
         this.orm = new ORM(this.db);
     }
 
-     async getCities() {
+    async getCities() {
         return await this.orm.all('cities');
     }
-    
+       
+    async getRoutes(coords, radius) {
+        const routes = await this.orm.all()
+    }
+
     destructor() {
         this.db.close();
     }

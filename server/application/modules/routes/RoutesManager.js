@@ -6,9 +6,13 @@ class RoutesManager extends BaseManager{
 
           this.mediator.set(this.TRIGGERS.GET_CITIES, (data) => this.triggerGetCities());
     }
-    async triggerGetCities()
-    {
-       return await this.db.getCities();
+
+    triggerGetCities() {
+       return this.db.getCities();
+    }
+
+    triggerGetRoutes(coords, radius) { // Возвращает маршруты в пределах радиуса
+        return this.db.getRoutes(coords, radius);
     }
 
 }
