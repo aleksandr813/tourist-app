@@ -1,6 +1,5 @@
 import CONFIG from "../../Config";
 import Store from "../Store";
-import CONFIG from "../../Config"
 
 const {HOST} = CONFIG;
 
@@ -13,16 +12,24 @@ export default class Server {
     async request(method, params = {}) {
         try {
             const query = Object.keys(params)
-                .map(key => `${key}=${encodeURIComponent(params[key])}`)
+                .map(key => `${key}=${params[key]}`)
                 .join('&');
-            const url = `${HOST}/${method}${query ? '?' + query : ''}`;
-            console.log(url);
+
+            const url = `${HOST}/${method}${query ? `?${query}` : ''}`;
+
             const response = await fetch(url);
             const answer = await response.json();
+
+            //console.log('Server response:', answer);
 
             if (answer.result === 'ok' && answer.data) {
                 return answer.data;
             }
+
+            if (answer.error) {
+                console.error('Server error:', answer.error);
+            }
+
             return null;
         } catch (e) {
             console.log('Request exception:', e);
