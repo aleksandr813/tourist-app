@@ -1,6 +1,6 @@
 const BaseManager = require('../BaseManager');
 
-class ExampleManager extends BaseManager{
+class RoutesManager extends BaseManager{
     constructor(params) {
         super(params);
 
@@ -13,4 +13,4 @@ class ExampleManager extends BaseManager{
 
 }
 
-module.exports = ExampleManager;
+module.exports = RoutesManager;

@@ -5,7 +5,7 @@ const Router = require('./application/router/Router');
 const Answer = require('./application/Answer');
 const DB = require('./application/modules/db/DB');
 const Mediator = require('./application/modules/Mediator/Mediator');
-const ExampleManager = require('./application/modules/example/ExampleManager');
+const RoutesManager = require('./application/modules/routes/RoutesManager');
 
 const { NAME, PORT, DATABASE } = CONFIG;
 
@@ -13,7 +13,7 @@ const db = new DB({ DATABASE });
 const mediator = new Mediator(CONFIG.MEDIATOR);
 const answer = new Answer();
 
-new ExampleManager({ mediator, db });
+new RoutesManager({ mediator, db });
 
 const router = new Router({ mediator, answer });
 
