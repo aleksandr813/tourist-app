@@ -13,6 +13,9 @@ const db = new DB({ DATABASE });
 const mediator = new Mediator(CONFIG.MEDIATOR);
 const answer = new Answer();
 
+const cors = require('cors');
+app.use(cors());
+
 new ExampleManager({ mediator, db });
 
 const router = new Router({ mediator, answer });

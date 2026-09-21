@@ -11,6 +11,7 @@ class Answer {
     }
 
     good(data) {
+        console.log(data);
         if (!data) {
             return this.error(9000);
         }
