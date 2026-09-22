@@ -1,11 +1,13 @@
-import { useContext, useEffect, useState } from 'react';
+import { use, useContext, useEffect, useState } from 'react';
 import RouteCard from './RouteCard';
-import { ServerContext } from '../../App';
+import { ServerContext, StoreContext } from '../../App';
 import CONFIG from '../../Config';
 import './RoutesPage.css';
 
-export default function RoutesPage({ selectedCity, setPage, PAGES }) {
+export default function RoutesPage({ setPage, PAGES }) {
   const server = useContext(ServerContext);
+  const store = useContext(StoreContext);
+  const selectedCity = store.get(selectedCity);
   const [routes, setRoutes] = useState([]);
   const [selectedRouteId, setSelectedRouteId] = useState(null);
 
@@ -25,7 +27,7 @@ export default function RoutesPage({ selectedCity, setPage, PAGES }) {
     }
 
     getRoutes();
-  }, [selectedCity]);
+  }, []);
 
   const selectedRoute = routes.find((route) => route.guid === selectedRouteId);
 
