@@ -1,6 +1,6 @@
 import PageManager from "../PageManager"
 import { useEffect, useState } from "react";
-import { ServerContext } from "../../App";
+import { ServerContext, StoreContext } from "../../App";
 import { useContext } from "react";
 
 import './StartPage.css'
@@ -8,11 +8,14 @@ import './StartPage.css'
 export default function StartPage({setPage, PAGES}){    
 
     const server = useContext(ServerContext);
+    const store = useContext(StoreContext);
     const [selected, setSelected] = useState("");
     const [citiesList, setCitiesList] = useState([]);
 
     async function sendCity() {
         await server.sendCity(selected);
+        store.setSelectedCity(selected);
+        store.getSelectedCity();
     }
 
     useEffect(() => {

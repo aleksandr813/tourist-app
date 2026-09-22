@@ -1,5 +1,5 @@
 import CONFIG from "../../Config";
-import Store from "../Store";
+import Store from "../Store/Store";
 
 const {HOST} = CONFIG;
 
