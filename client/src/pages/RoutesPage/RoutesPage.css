@@ -3,7 +3,9 @@
 .routes-page {
   box-sizing: border-box;
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 64px 24px;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   color: #fff;
   text-align: left;
   font-family: 'Unbounded', 'Segoe UI', sans-serif;
@@ -143,12 +145,45 @@
   margin: 24px 0 0;
 }
 
+.routes-page__fab {
+  position: fixed;
+  right: calc(24px + env(safe-area-inset-right, 0px));
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  width: 56px;
+  height: 56px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: #a855f7;
+  color: #ffffff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.25s ease;
+}
+
+.routes-page__fab:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.7);
+}
+
+.routes-page__fab:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
 @media (max-width: 600px) {
   .routes-page {
     padding: 32px 16px;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
   }
 
   .route-card {
     padding: 20px;
+  }
+
+  .routes-page__fab {
+    right: calc(16px + env(safe-area-inset-right, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   }
 }

@@ -48,7 +48,16 @@ export default class Server {
     }
 
     async sendCity(city) {
-        this.request('sendCity', {city});
+        return await this.request(`chooseCity/${city}`);
+    }
+
+    async getRoutesList({ x, y, radius }) {
+        const response = await this.request('getRoutes', { x, y, radius });
+        if (!response) {
+            return null;
+        }
+
+        return response;
     }
 
 }

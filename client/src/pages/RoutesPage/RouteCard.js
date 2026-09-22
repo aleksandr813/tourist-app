@@ -5,21 +5,21 @@ const priceFormatter = new Intl.NumberFormat('ru-RU', {
 });
 
 export default function RouteCard({ route, selected, onSelect }) {
-  const { id, name, price, coordinates } = route;
-  const titleId = `route-title-${id}`;
+  const { guid, title, cost, x, y } = route;
+  const titleId = `route-title-${guid}`;
 
   return (
     <article className={`route-card${selected ? ' route-card--selected' : ''}`} aria-labelledby={titleId}>
-      <h2 id={titleId}>{name}</h2>
+      <h2 id={titleId}>{title}</h2>
       <dl className="route-card__details">
         <div>
           <dt>Цена</dt>
-          <dd className="route-card__price">{price === 0 ? 'Бесплатно' : priceFormatter.format(price)}</dd>
+          <dd className="route-card__price">{!cost ? 'Бесплатно' : priceFormatter.format(cost)}</dd>
         </div>
         <div>
-          <dt>Координаты · широта, долгота</dt>
+          <dt>Координаты</dt>
           <dd className="route-card__coordinates">
-            {coordinates.latitude.toFixed(4)}, {coordinates.longitude.toFixed(4)}
+            {x}, {y}
           </dd>
         </div>
       </dl>
@@ -27,8 +27,8 @@ export default function RouteCard({ route, selected, onSelect }) {
         className="route-card__button"
         type="button"
         aria-pressed={selected}
-        aria-label={`${selected ? 'Выбран маршрут' : 'Выбрать маршрут'}: ${name}`}
-        onClick={() => onSelect(id)}
+        aria-label={`${selected ? 'Выбран маршрут' : 'Выбрать маршрут'}: ${title}`}
+        onClick={() => onSelect(guid)}
       >
         {selected ? 'Маршрут выбран' : 'Выбрать маршрут'}
       </button>
