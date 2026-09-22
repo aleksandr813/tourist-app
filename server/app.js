@@ -18,7 +18,7 @@ new RoutesManager({ mediator, db });
 const router = new Router({ mediator, answer });
 
 app.use(express.static(`${__dirname}/public`));
-app.use('/', router);
+app.use('/api', router);
 
 function deinit() {
     db.destrucor();
