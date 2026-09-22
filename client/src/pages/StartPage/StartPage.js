@@ -5,7 +5,7 @@ import { useContext } from "react";
 
 import './StartPage.css'
 
-export default function StartPage({setPage, PAGES, setSelectedCity}){
+export default function StartPage({setPage, PAGES}){
 
     const server = useContext(ServerContext);
     const store = useContext(StoreContext);
@@ -18,11 +18,10 @@ export default function StartPage({setPage, PAGES, setSelectedCity}){
             return;
         }
 
-        await server.sendCity(city.guid);
-        setSelectedCity(city);
         setPage(PAGES.ROUTES);
-        store.setSelectedCity(selected);
-        store.getSelectedCity();
+        store.set("selectedCity", selected);
+        store.get("selectedCity");
+        console.log(store.get("selectedCity"));
     }
 
     useEffect(() => {

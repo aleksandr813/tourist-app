@@ -1,16 +1,16 @@
 export default class Store{
 
-    selectedCity  = {};
+    data = {};
 
     constructor(){}
 
-    setSelectedCity(selectedCity){
-        this.selectCity = selectedCity;
+    set(name, value){
+        this.data[name] = value;
+
     }
 
-    getSelectedCity(){
-        console.log(this.selectedCity)
-        return this.selectedCity;
+    get(name){
+        return this.data[name];
     }
 
 }
