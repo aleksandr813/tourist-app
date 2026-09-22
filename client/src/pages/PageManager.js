@@ -9,10 +9,13 @@ export const PAGES = {
 
 const PageManager = () => {
     const [page, setPage] = useState(PAGES.START);
+    const [selectedCity, setSelectedCity] = useState(null);
 
     const props = {
         setPage,
         PAGES,
+        selectedCity,
+        setSelectedCity,
     };
 
     return (
