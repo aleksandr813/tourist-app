@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const CONFIG = require('./config');
 const Router = require('./application/router/Router');
 const Answer = require('./application/Answer');
@@ -14,6 +15,8 @@ const mediator = new Mediator(CONFIG.MEDIATOR);
 const answer = new Answer();
 
 new RoutesManager({ mediator, db });
+app.use(cors());
+
 
 const router = new Router({ mediator, answer });
 

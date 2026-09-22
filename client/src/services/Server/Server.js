@@ -1,4 +1,7 @@
+import CONFIG from "../../Config";
 import Store from "../Store";
+
+const {HOST} = CONFIG;
 
 export default class Server {   
 
@@ -6,18 +9,25 @@ export default class Server {
         this.store = store;
     }
 
-    async request(method, params) {
+    async request(method, params = {}) {
         try {
-            params.method = method;
+            const query = Object.keys(params)
+                .map(key => `${key}=${params[key]}`)
+                .join('&');
 
-            const url = `${this.HOST}/?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
+            const url = `${HOST}/${method}${query ? `?${query}` : ''}`;
 
             const response = await fetch(url);
             const answer = await response.json();
 
+            //console.log('Server response:', answer);
 
             if (answer.result === 'ok' && answer.data) {
                 return answer.data;
+            }
+
+            if (answer.error) {
+                console.error('Server error:', answer.error);
             }
 
             return null;
@@ -28,7 +38,7 @@ export default class Server {
     }
 
     async getCitiesList(){
-        const response = await this.request('getCitiesList');
+        const response = await this.request('getCities');   
         if (!response) {
             return null;
         }
