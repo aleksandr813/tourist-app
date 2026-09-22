@@ -29,31 +29,6 @@ class DB {
                     PRIMARY KEY(guid)
                 )
             `);
-
-            this.seedTestRoutes();
-        });
-    }
-
-    // Тестовые маршруты для демонстрации - рядом с координатами тестового города (Ижевск, x=312, y=312.3123)
-    seedTestRoutes() {
-        this.db.get('SELECT COUNT(*) as count FROM routes', (err, row) => {
-            if (err || (row && row.count > 0)) {
-                return;
-            }
-
-            const testRoutes = [
-                { guid: 'route-test-1', title: 'Прогулка по набережной Ижевска', cost: 500, x: 312.6, y: 312.9 },
-                { guid: 'route-test-2', title: 'Исторический центр и Ижевский пруд', cost: 900, x: 311.7, y: 311.9 },
-                { guid: 'route-test-3', title: 'Парк культуры и отдыха', cost: 0, x: 312.3, y: 313.1 },
-                { guid: 'route-test-4', title: 'Гастротур по Ижевску', cost: 1800, x: 312.0, y: 312.5 },
-            ];
-
-            testRoutes.forEach((route) => {
-                this.db.run(
-                    'INSERT INTO routes (guid, cost, title, x, y) VALUES (?, ?, ?, ?, ?)',
-                    [route.guid, route.cost, route.title, route.x, route.y]
-                );
-            });
         });
     }
 
@@ -61,7 +36,7 @@ class DB {
         return await this.orm.all('cities');
     }
 
-    async getRoutes(coords, radius) { // Возвращает маршруты в пределах радиуса от точки coords
+    async getRoutes(coords, radius) {
         const { x, y } = coords;
         return await this.orm.raw(
             `SELECT * FROM routes WHERE ((x - ?) * (x - ?) + (y - ?) * (y - ?)) <= (? * ?)`,
