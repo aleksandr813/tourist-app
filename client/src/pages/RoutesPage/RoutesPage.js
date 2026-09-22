@@ -4,7 +4,7 @@ import { ServerContext } from '../../App';
 import CONFIG from '../../Config';
 import './RoutesPage.css';
 
-export default function RoutesPage({ selectedCity }) {
+export default function RoutesPage({ selectedCity, setPage, PAGES }) {
   const server = useContext(ServerContext);
   const [routes, setRoutes] = useState([]);
   const [selectedRouteId, setSelectedRouteId] = useState(null);
@@ -57,6 +57,15 @@ export default function RoutesPage({ selectedCity }) {
           {selectedRoute ? `Выбран маршрут: ${selectedRoute.title}` : 'Выберите один из маршрутов выше.'}
         </p>
       </div>
+
+      <button
+        type="button"
+        className="routes-page__fab"
+        aria-label="Добавить маршрут"
+        onClick={() => setPage(PAGES.CREATE_ROUTE)}
+      >
+        +
+      </button>
     </main>
   );
 }

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import StartPage from './StartPage/StartPage';
 import RoutesPage from './RoutesPage/RoutesPage';
+import CreateRoutePage from './CreateRoutePage/CreateRoutePage';
 
 export const PAGES = {
     START: 'START',
-    ROUTES: 'ROUTES'
+    ROUTES: 'ROUTES',
+    CREATE_ROUTE: 'CREATE_ROUTE',
 };
 
 const PageManager = () => {
@@ -22,6 +24,7 @@ const PageManager = () => {
         <>
             {page === PAGES.START && <StartPage {...props} />}
             {page === PAGES.ROUTES && <RoutesPage {...props} />}
+            {page === PAGES.CREATE_ROUTE && <CreateRoutePage {...props} />}
         </>
     );
 };
