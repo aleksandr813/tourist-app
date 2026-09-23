@@ -4,7 +4,7 @@ class RoutesManager extends BaseManager{
     constructor(params) {
         super(params);
 
-          this.mediator.set(this.TRIGGERS.GET_CITIES, (data) => this.triggerGetCities());
+        this.mediator.set(this.TRIGGERS.GET_CITIES, (data) => this.triggerGetCities());
         this.mediator.set(this.TRIGGERS.GET_ROUTES, (data) => this.triggerGetRoutes(data.coords, data.radius));
     }
 

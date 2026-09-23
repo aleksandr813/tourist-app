@@ -75,6 +75,26 @@ class ORM {
         return await this._run(`INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`, values);
     }
 
+    // insertAll - добавляет все объекты из массива одним запросом в БД 
+    async insertAll(table, array){
+        if(array.length === 0) return;
+
+        const keys = Object.keys(array[0]);
+        const placeholders = keys.map(() => '?').join(', ');
+        const tuples = new Array();
+        const values = new Array();
+
+        for(let i = 0; i < array.length; i++){
+            const data = array[i];
+            tuples.push(`(${placeholders})`);
+            for(const key of keys){
+                values.push(data[key]);
+            }
+        }
+
+        return this._run(
+            `INSERT INTO ${table} (${keys.join(', ')}) VALUES ${tuples.join(', ')}`,values);
+}
     // UPDATE - оба аргумента объекты
     // orm.update('users', { role: 'moderator' }, { id: 1 })
     async update(table, data, params, operand = 'AND') {

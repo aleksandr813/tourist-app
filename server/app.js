@@ -5,6 +5,7 @@ const CONFIG = require('./config');
 const Router = require('./application/router/Router');
 const Answer = require('./application/Answer');
 const DB = require('./application/modules/db/DB');
+const Common = require('./application/modules/Common/Common');
 const Mediator = require('./application/modules/Mediator/Mediator');
 const RoutesManager = require('./application/modules/routes/RoutesManager');
 
@@ -13,8 +14,9 @@ const { NAME, PORT, DATABASE } = CONFIG;
 const db = new DB({ DATABASE });
 const mediator = new Mediator(CONFIG.MEDIATOR);
 const answer = new Answer();
+const common = new Common();
 
-new RoutesManager({ mediator, db });
+new RoutesManager({ mediator, db, common });
 app.use(cors());
 
 

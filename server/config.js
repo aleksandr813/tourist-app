@@ -15,6 +15,7 @@ const CONFIG = {
         TRIGGERS: {
             GET_CITIES: 'GET_CITIES',
             GET_ROUTES: 'GET_ROUTES',
+            GET_PLACES: 'GET_PLACES',
             EXAMPLE_TRIGGER: 'EXAMPLE TRIGGER',
         },
     },
