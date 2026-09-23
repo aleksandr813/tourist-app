@@ -77,25 +77,23 @@ class ORM {
 
     // insertAll - добавляет все объекты из массива одним запросом в БД 
     async insertAll(table, array){
-    if(array.length === 0) return;
+        if(array.length === 0) return;
 
-    const keys = Object.keys(array[0]);
-    const placeholders = keys.map(() => '?').join(', ');
-    const tuples = new Array();
-    const values = new Array();
+        const keys = Object.keys(array[0]);
+        const placeholders = keys.map(() => '?').join(', ');
+        const tuples = new Array();
+        const values = new Array();
 
-    for(let i = 0; i < array.length; i++){
-        const data = array[i];
-        tuples.push(`(${placeholders})`);
-        for(const key of keys){
-            values.push(data[key]);
+        for(let i = 0; i < array.length; i++){
+            const data = array[i];
+            tuples.push(`(${placeholders})`);
+            for(const key of keys){
+                values.push(data[key]);
+            }
         }
-    }
 
-    return this._run(
-        `INSERT INTO ${table} (${keys.join(', ')}) VALUES ${tuples.join(', ')}`,
-        values
-    );
+        return this._run(
+            `INSERT INTO ${table} (${keys.join(', ')}) VALUES ${tuples.join(', ')}`,values);
 }
     // UPDATE - оба аргумента объекты
     // orm.update('users', { role: 'moderator' }, { id: 1 })

@@ -54,8 +54,8 @@ class DB {
         );
     }
 
-    async addPlaces(array){
-        insertAll('places',array);
+    async addPlaces(table,array){
+        this.orm.insertAll(table,array);
     }
 
     destructor() {
