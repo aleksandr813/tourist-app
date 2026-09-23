@@ -11,7 +11,7 @@ class RoutesManager extends BaseManager{
     triggerGetCities() {
        return this.db.getCities();
     }
-    
+
     triggerGetRoutes(coords, radius) { // Возвращает маршруты в пределах радиуса
         return this.db.getRoutes(coords, radius);
     }
