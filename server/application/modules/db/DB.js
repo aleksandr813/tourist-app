@@ -37,6 +37,7 @@ class DB {
                 y	REAL NOT NULL,
                 price	REAL NOT NULL,
                 description	TEXT NOT NULL,
+                route_guid  TEXT,
                 FOREIGN KEY("route_guid") REFERENCES "routes"("guid")
                 )
             `);
