@@ -35,5 +35,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@yandex/ymaps3-types": "^1.0.21108841"
   }
 }
