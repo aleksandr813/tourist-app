@@ -53,7 +53,7 @@ class DB {
             [x, x, y, y, radius, radius]
         );
     }
-
+    
     destructor() {
         this.db.close();
     }
