@@ -94,7 +94,7 @@ class ORM {
 
         return this._run(
             `INSERT INTO ${table} (${keys.join(', ')}) VALUES ${tuples.join(', ')}`,values);
-}
+    }
     // UPDATE - оба аргумента объекты
     // orm.update('users', { role: 'moderator' }, { id: 1 })
     async update(table, data, params, operand = 'AND') {

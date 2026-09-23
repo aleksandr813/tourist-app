@@ -36,7 +36,8 @@ class DB {
                 x	REAL NOT NULL,
                 y	REAL NOT NULL,
                 price	REAL NOT NULL,
-                description	TEXT NOT NULL
+                description	TEXT NOT NULL,
+                FOREIGN KEY("route_guid") REFERENCES "routes"("guid")
                 )
             `);
         });
