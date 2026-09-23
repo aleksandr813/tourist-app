@@ -29,6 +29,16 @@ class DB {
                     PRIMARY KEY(guid)
                 )
             `);
+            this.db.run(`
+                CREATE TABLE IF NOT EXISTS places (
+                guid	TEXT NOT NULL UNIQUE,
+                name	TEXT NOT NULL,
+                x	REAL NOT NULL,
+                y	REAL NOT NULL,
+                price	REAL NOT NULL,
+                description	TEXT NOT NULL
+                )
+            `);
         });
     }
 
@@ -42,6 +52,10 @@ class DB {
             `SELECT * FROM routes WHERE ((x - ?) * (x - ?) + (y - ?) * (y - ?)) <= (? * ?)`,
             [x, x, y, y, radius, radius]
         );
+    }
+
+    async addPlaces(table,array){
+        this.orm.insertAll(table,array);
     }
 
     destructor() {
