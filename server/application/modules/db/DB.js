@@ -53,7 +53,11 @@ class DB {
             [x, x, y, y, radius, radius]
         );
     }
-    
+
+    async addPlaces(array){
+        insertAll('places',array);
+    }
+
     destructor() {
         this.db.close();
     }
