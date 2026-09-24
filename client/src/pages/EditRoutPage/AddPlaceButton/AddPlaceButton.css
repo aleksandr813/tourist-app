@@ -1,0 +1,87 @@
+/* ===== AddPlaceButton.css ===== */
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600&display=swap');
+
+.add-place-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #8a2be2, #4f7bff 60%, #00bfff);
+  color: #ffffff;
+  font: inherit;
+  font-family: 'Unbounded', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35),
+              0 0 28px rgba(138, 43, 226, 0.6);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease,
+    transform 0.15s ease, filter 0.25s ease, opacity 0.2s ease;
+}
+
+.add-place-btn::before {
+  content: "+";
+  font-size: 22px;
+  line-height: 1;
+}
+
+.add-place-btn:not(:disabled):hover {
+  border-color: #ffffff;
+  filter: brightness(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35),
+              0 0 40px rgba(168, 85, 247, 0.85),
+              0 0 70px rgba(0, 191, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.add-place-btn:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.add-place-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.add-place-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Ждём клик по карте */
+.add-place-btn--active {
+  border-color: #ffffff;
+  animation: add-place-pulse 1.6s ease-in-out infinite;
+}
+
+.add-place-btn--active::before {
+  content: "⌖";
+}
+
+@keyframes add-place-pulse {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35),
+                0 0 30px rgba(168, 85, 247, 0.8),
+                0 0 60px rgba(0, 191, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35),
+                0 0 50px rgba(168, 85, 247, 1),
+                0 0 90px rgba(0, 191, 255, 0.6);
+  }
+}
+
+@media (max-width: 640px) {
+  .add-place-btn { min-height: 52px; font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .add-place-btn { transition: none; animation: none; }
+}
