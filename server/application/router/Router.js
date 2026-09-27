@@ -4,6 +4,7 @@ const router = express.Router();
 const {
     notFoundHandler,
     useChooseCityHandler,
+    useAddRouteHandler,
 } = require('./handlers');
 
 const useGetCitiesHandler = require('./handlers/useGetCitiesHandler');
@@ -13,6 +14,7 @@ function Router({ mediator, answer }) {
     router.get('/chooseCity/:city', useChooseCityHandler(mediator,answer) );
     router.get('/getCities',useGetCitiesHandler(mediator, answer) );
     router.get('/getRoutes', useGetRoutesHandler(mediator, answer) );
+    router.post('/addRoute', useAddRouteHandler(mediator, answer) );
     router.all('/*path', notFoundHandler);
     return router;
 }

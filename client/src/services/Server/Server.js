@@ -9,7 +9,7 @@ export default class Server {
         this.store = store;
     }
 
-    async request(method, params = {}) {
+    async request(method, params = {}, options = {}) {
         try {
             const query = Object.keys(params)
                 .map(key => `${key}=${params[key]}`)
@@ -17,7 +17,7 @@ export default class Server {
 
             const url = `${HOST}/${method}${query ? `?${query}` : ''}`;
 
-            const response = await fetch(url);
+            const response = await fetch(url, options);
             const answer = await response.json();
 
             //console.log('Server response:', answer);
@@ -58,6 +58,14 @@ export default class Server {
         }
 
         return response;
+    }
+
+    async addRoute(route, places) {
+        return await this.request('addRoute', {}, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ route, places }),
+        });
     }
 
 }

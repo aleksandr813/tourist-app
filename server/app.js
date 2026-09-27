@@ -18,6 +18,7 @@ const common = new Common();
 
 new RoutesManager({ mediator, db, common });
 app.use(cors());
+app.use(express.json());
 
 
 const router = new Router({ mediator, answer });

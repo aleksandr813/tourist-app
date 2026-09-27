@@ -12,7 +12,7 @@ export const PAGES = {
 };
 
 const PageManager = () => {
-    const [page, setPage] = useState(PAGES.EDIT);
+    const [page, setPage] = useState(PAGES.START);
     const [selectedCity, setSelectedCity] = useState(null);
 
     const props = {

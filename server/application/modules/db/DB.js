@@ -22,10 +22,12 @@ class DB {
             this.db.run(`
                 CREATE TABLE IF NOT EXISTS routes (
                     guid TEXT NOT NULL UNIQUE,
+                    name TEXT NOT NULL,
                     cost INTEGER,
                     title TEXT NOT NULL,
                     x REAL,
                     y REAL,
+                    author_id TEXT NOT NULL,
                     PRIMARY KEY(guid)
                 )
             `);
@@ -56,8 +58,12 @@ class DB {
         );
     }
 
+    async addRoute(route) {
+        return await this.orm.insert('routes', route);
+    }
+
     async addPlaces(table,array){
-        this.orm.insertAll(table,array);
+        return await this.orm.insertAll(table,array);
     }
 
     destructor() {

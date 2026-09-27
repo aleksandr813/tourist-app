@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Directions } from '@2gis/mapgl-directions';
 import { load } from "@2gis/mapgl";
-import { StoreContext } from "../../App";
+import { ServerContext, StoreContext } from "../../App";
 import AddPlaceButton from "./AddPlaceButton/AddPlaceButton";
 import AddPlaceCart from "./AddPlaceCart/AddPlaceCart";
 
@@ -28,9 +28,12 @@ export default function EditRoutPage({ setPage, PAGES }) {
     const [mapError, setMapError] = useState(null);
     const [points, setPoints] = useState([]);
     const [draftPoint, setDraftPoint] = useState(null);
-
+    const [publishError, setPublishError] = useState(null);
+    const [isSelecting, setIsSelecting] = useState(false);
 
     const store = useContext(StoreContext);
+    const server = useContext(ServerContext);
+    const selectedCity = store.get("selectedCity");
 
     useEffect(() => {
         let cancelled = false;
@@ -40,7 +43,7 @@ export default function EditRoutPage({ setPage, PAGES }) {
                 if (cancelled || !containerRef.current) return;
 
                 const map = new mapglAPI.Map(containerRef.current, {
-                    center: [37.618423, 55.751244],
+                    center: [selectedCity.x, selectedCity.y],
                     zoom: 10,
                     key: MAPGL_KEY,
                 });
@@ -61,9 +64,12 @@ export default function EditRoutPage({ setPage, PAGES }) {
                         lng: coords[0],
                         lat: coords[1],
                         name: "",
+                        price: "",
+                        description: "",
                     });
 
                     store.set("selecting", "idle");
+                    setIsSelecting(false);
                 });
             })
 
@@ -110,6 +116,12 @@ export default function EditRoutPage({ setPage, PAGES }) {
         }
     };
 
+    const toggleSelecting = () => {
+        const nextIsSelecting = !isSelecting;
+        store.set("selecting", nextIsSelecting ? "waiting" : "idle");
+        setIsSelecting(nextIsSelecting);
+    };
+
     const handleCancelPoint = () => {
         setDraftPoint(null);
     };
@@ -117,12 +129,40 @@ export default function EditRoutPage({ setPage, PAGES }) {
     function resetRoute() {
         store.set("points", []);
         store.set("selecting", "idle");
+        setIsSelecting(false);
         setPoints([]);
         directionsRef.current?.clear();
         markersRef.current.forEach((m) => m.destroy());
         markersRef.current = [];
     }
-              
+
+    async function publishRoute() {
+        const places = points.map(({ name, price, description, lng, lat }) => ({
+            name,
+            price,
+            description,
+            x: lng,
+            y: lat,
+        }));
+        const route = {
+            ...store.get("route"),
+            cost: places.reduce((sum, place) => sum + place.price, 0),
+            x: selectedCity.x,
+            y: selectedCity.y,
+            author_id: store.get("userId"),
+        };
+
+        const routeGuid = await server.addRoute(route, places);
+        if (!routeGuid) {
+            setPublishError("Не удалось опубликовать маршрут");
+            return;
+        }
+
+        resetRoute();
+        store.set("route", null);
+        setPage(PAGES.ROUTES);
+    }
+
 
     if (mapError) {
         return (
@@ -135,13 +175,32 @@ export default function EditRoutPage({ setPage, PAGES }) {
 
     return (
         <div className="edit-route">
-            <div ref={containerRef} className="edit-route__map" />
+            <div
+                ref={containerRef}
+                className={`edit-route__map ${isSelecting ? "edit-route__map--selecting" : ""}`}
+            />
+
+            {isSelecting && (
+                <p className="surface edit-route__hint">
+                    Нажмите на карту, чтобы поставить метку
+                </p>
+            )}
 
             <div className="edit-route__panel">
-                <AddPlaceButton/>
+                <AddPlaceButton active={isSelecting} onClick={toggleSelecting} />
                 <button className="btn-secondary" onClick={resetRoute}>
                     Сбросить
                 </button>
+                <button
+                    className="btn-secondary"
+                    onClick={publishRoute}
+                    disabled={points.length === 0}
+                >
+                    Опубликовать
+                </button>
+                {publishError && (
+                    <p className="surface edit-route__publish-error">{publishError}</p>
+                )}
 
                 <div className="surface points-list">
                     <p className="points-list__title">Точки</p>
@@ -163,11 +222,13 @@ export default function EditRoutPage({ setPage, PAGES }) {
                 </div>
             </div>
 
-            <AddPlaceCart
-                point={draftPoint}
-                onSave={handleSavePoint}
-                onCancel={handleCancelPoint}
-            />
+            {draftPoint && (
+                <AddPlaceCart
+                    point={draftPoint}
+                    onSave={handleSavePoint}
+                    onCancel={handleCancelPoint}
+                />
+            )}
         </div>
     );
 }

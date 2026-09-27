@@ -7,7 +7,7 @@ import './RoutesPage.css';
 export default function RoutesPage({ setPage, PAGES }) {
   const server = useContext(ServerContext);
   const store = useContext(StoreContext);
-  const selectedCity = store.get(selectedCity);
+  const selectedCity = store.get("selectedCity");
   const [routes, setRoutes] = useState([]);
   const [selectedRouteId, setSelectedRouteId] = useState(null);
 

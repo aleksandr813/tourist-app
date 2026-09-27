@@ -69,6 +69,10 @@
     background-color 0.25s ease;
 }
 
+.place-cart__textarea {
+  resize: vertical;
+}
+
 .place-cart__input::placeholder {
   color: rgba(255, 255, 255, 0.55);
 }
@@ -122,6 +126,13 @@
 
 .place-cart__button:active {
   transform: translateY(0);
+}
+
+.place-cart__button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .place-cart__button:focus-visible {

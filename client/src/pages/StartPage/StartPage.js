@@ -18,10 +18,8 @@ export default function StartPage({setPage, PAGES}){
             return;
         }
 
+        store.set("selectedCity", city);
         setPage(PAGES.ROUTES);
-        store.set("selectedCity", selected);
-        store.get("selectedCity");
-        console.log(store.get("selectedCity"));
     }
 
     useEffect(() => {

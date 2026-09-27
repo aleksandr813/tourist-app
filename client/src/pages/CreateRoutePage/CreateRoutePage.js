@@ -1,13 +1,22 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { StoreContext } from '../../App';
 import './CreateRoutePage.css';
 
-export default function CreateRoutePage({ setPage, PAGES, selectedCity }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+export default function CreateRoutePage({ setPage, PAGES }) {
+  const store = useContext(StoreContext);
+  const selectedCity = store.get('selectedCity');
+  const routeDraft = store.get('route');
+  const [name, setName] = useState(routeDraft?.name ?? '');
+  const [title, setTitle] = useState(routeDraft?.title ?? '');
   const [durationDays, setDurationDays] = useState(1);
 
   function goBack() {
     setPage(PAGES.ROUTES);
+  }
+
+  function goToPlaces() {
+    store.set('route', { name: name.trim(), title: title.trim() });
+    setPage(PAGES.EDIT);
   }
 
   return (
@@ -31,8 +40,8 @@ export default function CreateRoutePage({ setPage, PAGES, selectedCity }) {
             <span>Название маршрута</span>
             <input
               type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Например, «Исторический центр за день»"
             />
           </label>
@@ -45,8 +54,8 @@ export default function CreateRoutePage({ setPage, PAGES, selectedCity }) {
           <label className="create-route-page__field">
             <span>Описание</span>
             <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               rows={4}
               placeholder="Для кого этот маршрут, что стоит знать заранее"
             />
@@ -74,12 +83,14 @@ export default function CreateRoutePage({ setPage, PAGES, selectedCity }) {
             </label>
           </fieldset>
 
-          <button type="button" className="create-route-page__next" disabled>
+          <button
+            type="button"
+            className="create-route-page__next"
+            disabled={!name.trim() || !title.trim()}
+            onClick={goToPlaces}
+          >
             Далее - расставить места на карте
           </button>
-          <p className="create-route-page__note">
-            Расстановка точек маршрута на карте пока в разработке.
-          </p>
         </form>
       </div>
     </main>
