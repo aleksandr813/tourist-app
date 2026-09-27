@@ -1,0 +1,120 @@
+.place-card__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  padding: 24px;
+  overflow-y: auto;
+  background: rgba(13, 13, 26, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.place-card {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(0, 191, 255, 0.15)),
+    rgba(13, 13, 26, 0.92);
+  box-shadow: 0 0 48px rgba(138, 43, 226, 0.55);
+  color: #ffffff;
+  text-align: left;
+  font-family: 'Unbounded', 'Segoe UI', sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.place-card__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(13, 13, 26, 0.7);
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.place-card__photo {
+  display: block;
+  width: calc(100% + 56px);
+  height: 200px;
+  margin: -28px -28px 20px;
+  object-fit: cover;
+  border-radius: 20px 20px 0 0;
+}
+
+.place-card__number {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #c5c5dc;
+}
+
+.place-card__title {
+  margin: 0 0 12px;
+  padding-right: 32px;
+  font-size: clamp(20px, 4vw, 24px);
+  font-weight: 600;
+}
+
+.place-card__price {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.place-card__description {
+  margin: 0 0 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #e0e0f0;
+  white-space: pre-line;
+}
+
+.place-card__button {
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 16px;
+  border: 1px solid rgba(168, 85, 247, 0.55);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.65), rgba(0, 191, 255, 0.4));
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.place-card__button:focus-visible,
+.place-card__close:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .place-card__overlay {
+    padding: 16px;
+  }
+
+  .place-card {
+    padding: 22px;
+  }
+
+  .place-card__photo {
+    width: calc(100% + 44px);
+    height: 170px;
+    margin: -22px -22px 18px;
+  }
+}

@@ -8,6 +8,7 @@ export default function CreateRoutePage({ setPage, PAGES }) {
   const routeDraft = store.get('route');
   const [name, setName] = useState(routeDraft?.name ?? '');
   const [title, setTitle] = useState(routeDraft?.title ?? '');
+  const [cover, setCover] = useState(routeDraft?.cover ?? null);
   const [durationDays, setDurationDays] = useState(1);
 
   function goBack() {
@@ -15,7 +16,7 @@ export default function CreateRoutePage({ setPage, PAGES }) {
   }
 
   function goToPlaces() {
-    store.set('route', { name: name.trim(), title: title.trim() });
+    store.set('route', { name: name.trim(), title: title.trim(), cover });
     setPage(PAGES.EDIT);
   }
 
@@ -33,7 +34,12 @@ export default function CreateRoutePage({ setPage, PAGES }) {
         <form className="create-route-page__form" onSubmit={(e) => e.preventDefault()}>
           <label className="create-route-page__field">
             <span>Обложка маршрута</span>
-            <input type="file" accept="image/*" />
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => setCover(e.target.files[0] ?? null)}
+            />
+            {cover && <span className="create-route-page__file">Выбрано: {cover.name}</span>}
           </label>
 
           <label className="create-route-page__field">

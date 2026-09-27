@@ -10,31 +10,28 @@ export default class Server {
     }
 
     async request(method, params = {}, options = {}) {
-        try {
-            const query = Object.keys(params)
-                .map(key => `${key}=${params[key]}`)
-                .join('&');
+        const query = Object.keys(params)
+            .filter(key => params[key] != null)
+            .map(key => `${key}=${encodeURIComponent(params[key])}`)
+            .join('&');
 
-            const url = `${HOST}/${method}${query ? `?${query}` : ''}`;
+        const url = `${HOST}/${method}${query ? `?${query}` : ''}`;
 
-            const response = await fetch(url, options);
-            const answer = await response.json();
+        const response = await fetch(url, options);
+        const isJson = response.headers.get('Content-Type')?.includes('application/json');
 
-            //console.log('Server response:', answer);
-
-            if (answer.result === 'ok' && answer.data) {
-                return answer.data;
-            }
-
-            if (answer.error) {
-                console.error('Server error:', answer.error);
-            }
-
-            return null;
-        } catch (e) {
-            console.log('Request exception:', e);
+        if (!response.ok || !isJson) {
+            console.error('Server error:', await response.text());
             return null;
         }
+
+        const answer = await response.json();
+
+        if (answer.result === 'ok' && answer.data) {
+            return answer.data;
+        }
+
+        return null;
     }
 
     async getCitiesList(){
@@ -51,13 +48,35 @@ export default class Server {
         return await this.request(`chooseCity/${city}`);
     }
 
-    async getRoutesList({ x, y, radius }) {
-        const response = await this.request('getRoutes', { x, y, radius });
+    async getRoutesList({ city, user, sort, page }) {
+        const response = await this.request('getRoutes', { city, user, sort, page });
         if (!response) {
             return null;
         }
 
         return response;
+    }
+
+    async toggleLike(routeGuid, userId) {
+        return await this.request('toggleLike', {}, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ route_guid: routeGuid, user_id: userId }),
+        });
+    }
+
+    async getPlaces(routeGuid) {
+        return await this.request('getPlaces', { route: routeGuid });
+    }
+
+    async uploadImage(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        return await this.request('uploadImage', {}, {
+            method: 'POST',
+            body: formData,
+        });
     }
 
     async addRoute(route, places) {

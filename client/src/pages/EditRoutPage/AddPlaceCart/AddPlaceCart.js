@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import "./AddPlaceCart.css"
 
@@ -6,6 +6,18 @@ export default function AddPlaceCart({ point, onSave, onCancel }) {
     const [name, setName] = useState(point.name);
     const [price, setPrice] = useState(point.price);
     const [description, setDescription] = useState(point.description);
+    const [photo, setPhoto] = useState(point.photo);
+    const [photoPreview, setPhotoPreview] = useState(null);
+
+    useEffect(() => {
+        if (!photo) {
+            setPhotoPreview(null);
+            return;
+        }
+        const url = URL.createObjectURL(photo);
+        setPhotoPreview(url);
+        return () => URL.revokeObjectURL(url);
+    }, [photo]);
 
     const isValid = name.trim() && price !== "" && Number(price) >= 0;
 
@@ -15,6 +27,7 @@ export default function AddPlaceCart({ point, onSave, onCancel }) {
             name: name.trim(),
             price: Number(price),
             description: description.trim(),
+            photo,
         });
     };
 
@@ -26,6 +39,20 @@ export default function AddPlaceCart({ point, onSave, onCancel }) {
                 <p className="place-cart__coords">
                     {point.lng.toFixed(5)}, {point.lat.toFixed(5)}
                 </p>
+
+                <label className="place-cart__photo">
+                    {photoPreview ? (
+                        <img className="place-cart__photo-preview" src={photoPreview} alt="Фото места" />
+                    ) : (
+                        <span>Загрузить фото</span>
+                    )}
+                    <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(e) => setPhoto(e.target.files[0] ?? null)}
+                        hidden
+                    />
+                </label>
 
                 <input
                     className="place-cart__input"

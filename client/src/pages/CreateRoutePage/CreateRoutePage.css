@@ -96,6 +96,11 @@
   opacity: 0.6;
 }
 
+.create-route-page__file {
+  font-size: 13px;
+  color: #ffffff;
+}
+
 .create-route-page__duration {
   border: none;
   padding: 0;

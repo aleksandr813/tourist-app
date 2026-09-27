@@ -1,7 +1,13 @@
+import CONFIG from "../../Config";
+
 export default class Max {
 
     getUserId() {
-        return window.WebApp?.initDataUnsafe?.user?.id ?? null;
+        const userId = window.WebApp?.initDataUnsafe?.user?.id;
+        if (userId) {
+            return userId;
+        }
+        return process.env.NODE_ENV === "development" ? CONFIG.DEV_USER_ID : null;
     }
 
 }

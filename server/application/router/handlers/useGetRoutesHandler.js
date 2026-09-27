@@ -1,15 +1,26 @@
+const { isString, isOptionalString } = require('../validators');
+
 module.exports = (mediator, answer) => {
     const { GET_ROUTES } = mediator.getTriggerTypes();
     return async (req, res) => {
-        const { x, y, radius } = req.query;
+        const { city, user, sort, page = 1 } = req.query;
+        const pageNumber = Number(page);
 
-        if (!x || !y || !radius) {
+        if (
+            !isString(city) ||
+            !isOptionalString(user) ||
+            !isOptionalString(sort) ||
+            !Number.isInteger(pageNumber) ||
+            pageNumber < 1
+        ) {
             return res.send(answer.bad(67));
         }
 
         const routes = await mediator.get(GET_ROUTES, {
-            coords: { x: Number(x), y: Number(y) },
-            radius: Number(radius),
+            cityGuid: city,
+            userId: user ?? null,
+            sort,
+            page: pageNumber,
         });
 
         return res.send(answer.good(routes));

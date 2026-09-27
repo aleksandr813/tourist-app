@@ -2,12 +2,12 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Directions } from '@2gis/mapgl-directions';
 import { load } from "@2gis/mapgl";
 import { ServerContext, StoreContext } from "../../App";
+import CONFIG from "../../Config";
+import RouteToggleButton from "../../components/RouteToggleButton/RouteToggleButton";
 import AddPlaceButton from "./AddPlaceButton/AddPlaceButton";
 import AddPlaceCart from "./AddPlaceCart/AddPlaceCart";
 
 import "./EditRoutPage.css";
-
-const MAPGL_KEY = "3437ff1b-602e-4a97-a906-169b3493070a";
 
 const MARKER_ICON =
     "data:image/svg+xml;charset=UTF-8," +
@@ -30,6 +30,8 @@ export default function EditRoutPage({ setPage, PAGES }) {
     const [draftPoint, setDraftPoint] = useState(null);
     const [publishError, setPublishError] = useState(null);
     const [isSelecting, setIsSelecting] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [isRouteVisible, setIsRouteVisible] = useState(true);
 
     const store = useContext(StoreContext);
     const server = useContext(ServerContext);
@@ -45,13 +47,13 @@ export default function EditRoutPage({ setPage, PAGES }) {
                 const map = new mapglAPI.Map(containerRef.current, {
                     center: [selectedCity.x, selectedCity.y],
                     zoom: 10,
-                    key: MAPGL_KEY,
+                    key: CONFIG.MAPGL_KEY,
                 });
                 mapRef.current = map;
                 mapglAPIRef.current = mapglAPI;
 
                 const directions = new Directions(map, {
-                    directionsApiKey: MAPGL_KEY,
+                    directionsApiKey: CONFIG.MAPGL_KEY,
                 });
                 directionsRef.current = directions;
 
@@ -66,6 +68,7 @@ export default function EditRoutPage({ setPage, PAGES }) {
                         name: "",
                         price: "",
                         description: "",
+                        photo: null,
                     });
 
                     store.set("selecting", "idle");
@@ -90,6 +93,18 @@ export default function EditRoutPage({ setPage, PAGES }) {
         };
     }, []);
 
+    useEffect(() => {
+        const directions = directionsRef.current;
+        if (!directions) return;
+
+        if (isRouteVisible && points.length >= 2) {
+            directions.pedestrianRoute({
+                points: points.map((p) => [p.lng, p.lat]),
+            });
+        } else {
+            directions.clear();
+        }
+    }, [points, isRouteVisible]);
 
     const handleSavePoint = (point) => {
         const newPoints = [...(store.get("points") || []), point];
@@ -108,12 +123,6 @@ export default function EditRoutPage({ setPage, PAGES }) {
             });
             markersRef.current.push(marker);
         }
-
-        if (newPoints.length >= 2) {
-            directionsRef.current?.pedestrianRoute({
-                points: newPoints.map((p) => [p.lng, p.lat]),
-            });
-        }
     };
 
     const toggleSelecting = () => {
@@ -131,28 +140,51 @@ export default function EditRoutPage({ setPage, PAGES }) {
         store.set("selecting", "idle");
         setIsSelecting(false);
         setPoints([]);
-        directionsRef.current?.clear();
         markersRef.current.forEach((m) => m.destroy());
         markersRef.current = [];
     }
 
+    async function uploadPhotos(photos) {
+        const urls = await Promise.all(
+            photos.map((photo) => (photo ? server.uploadImage(photo) : null))
+        );
+        const isUploaded = urls.every((url, i) => !photos[i] || url);
+        return isUploaded ? urls : null;
+    }
+
     async function publishRoute() {
-        const places = points.map(({ name, price, description, lng, lat }) => ({
+        setIsPublishing(true);
+        setPublishError(null);
+
+        const { cover, ...routeDraft } = store.get("route");
+        const photoUrls = await uploadPhotos([cover, ...points.map((point) => point.photo)]);
+        if (!photoUrls) {
+            setPublishError("Не удалось загрузить фото");
+            setIsPublishing(false);
+            return;
+        }
+        const [coverUrl, ...placePhotoUrls] = photoUrls;
+
+        const places = points.map(({ name, price, description, lng, lat }, i) => ({
             name,
             price,
             description,
             x: lng,
             y: lat,
+            photo_url: placePhotoUrls[i],
         }));
         const route = {
-            ...store.get("route"),
+            ...routeDraft,
             cost: places.reduce((sum, place) => sum + place.price, 0),
             x: selectedCity.x,
             y: selectedCity.y,
             author_id: store.get("userId"),
+            city_guid: selectedCity.guid,
+            photo_url: coverUrl,
         };
 
         const routeGuid = await server.addRoute(route, places);
+        setIsPublishing(false);
         if (!routeGuid) {
             setPublishError("Не удалось опубликовать маршрут");
             return;
@@ -191,12 +223,17 @@ export default function EditRoutPage({ setPage, PAGES }) {
                 <button className="btn-secondary" onClick={resetRoute}>
                     Сбросить
                 </button>
+                <RouteToggleButton
+                    visible={isRouteVisible}
+                    onToggle={() => setIsRouteVisible(!isRouteVisible)}
+                    disabled={points.length < 2}
+                />
                 <button
                     className="btn-secondary"
                     onClick={publishRoute}
-                    disabled={points.length === 0}
+                    disabled={points.length === 0 || isPublishing}
                 >
-                    Опубликовать
+                    {isPublishing ? "Публикуем…" : "Опубликовать"}
                 </button>
                 {publishError && (
                     <p className="surface edit-route__publish-error">{publishError}</p>

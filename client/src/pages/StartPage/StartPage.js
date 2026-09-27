@@ -1,33 +1,42 @@
-import PageManager from "../PageManager"
 import { useEffect, useState } from "react";
 import { ServerContext, StoreContext } from "../../App";
 import { useContext } from "react";
+import Geo from "../../services/Geo/Geo";
+import CitySearch from "./CitySearch/CitySearch";
 
 import './StartPage.css'
+
+const geo = new Geo();
 
 export default function StartPage({setPage, PAGES}){
 
     const server = useContext(ServerContext);
     const store = useContext(StoreContext);
-    const [selected, setSelected] = useState("");
     const [citiesList, setCitiesList] = useState([]);
+    const [selectedCity, setSelectedCity] = useState(null);
+    const [nearestCity, setNearestCity] = useState(null);
 
-    async function sendCity() {
-        const city = citiesList.find((item) => item.guid === selected);
-        if (!city) {
-            return;
-        }
-
-        store.set("selectedCity", city);
+    function sendCity() {
+        store.set("selectedCity", selectedCity);
+        store.set("routesPage", 1);
         setPage(PAGES.ROUTES);
     }
 
     useEffect(() => {
         async function getCities(){
             const citiesList = await server.getCitiesList();
-            if (citiesList) {
-                setCitiesList(citiesList);
+            if (!citiesList) {
+                return;
             }
+            setCitiesList(citiesList);
+
+            const position = await geo.getPosition();
+            if (!position) {
+                return;
+            }
+            const city = geo.findNearest(citiesList, position);
+            setNearestCity(city);
+            setSelectedCity((currentCity) => currentCity ?? city);
         }
         getCities();
     },[])
@@ -40,20 +49,17 @@ export default function StartPage({setPage, PAGES}){
                     Найдите готовые туристические маршруты и узнайте стоимость дня заранее
                 </p>
 
-                <select
-                    className="choose-town__select"
-                    value={selected}
-                    onChange={(e) => setSelected(e.target.value)}
-                >
-                    <option value="">Выберите город...</option>
-                    {citiesList.map((item) => (
-                        <option key={item.guid} value={item.guid}>
-                            {item.city}
-                        </option>
-                    ))}
-                </select>
+                <CitySearch
+                    cities={citiesList}
+                    value={selectedCity}
+                    onChange={setSelectedCity}
+                />
 
-                <button className="choose-town__button" onClick={sendCity} disabled={!selected}>
+                {selectedCity && selectedCity.guid === nearestCity?.guid && (
+                    <p className="choose-town__hint">Ближайший к вам город</p>
+                )}
+
+                <button className="choose-town__button" onClick={sendCity} disabled={!selectedCity}>
                     Далее
                 </button>
             </div>
