@@ -6,7 +6,7 @@ ENV NODE_ENV=production \
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY . .
-RUN mkdir -p /app/data /app/public/uploads
+RUN mv /app/public/uploads /app/seed-uploads && mkdir -p /app/data /app/public/uploads
 EXPOSE 3003
 ENTRYPOINT ["sh", "./docker-entrypoint.sh"]
 CMD ["node", "app.js"]

@@ -5,4 +5,10 @@ if [ ! -f "$DATABASE_DIR/data.db" ]; then
     cp ./application/modules/db/data.db "$DATABASE_DIR/data.db"
 fi
 
+for file in ./seed-uploads/*; do
+    if [ ! -f "./public/uploads/${file##*/}" ]; then
+        cp "$file" ./public/uploads/
+    fi
+done
+
 exec "$@"
