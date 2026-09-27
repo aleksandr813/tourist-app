@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
+import { StoreContext } from '../../App';
+import useMaxBackButton from '../../hooks/useMaxBackButton';
 import './CreateRoutePage.css';
 
-export default function CreateRoutePage({ setPage, PAGES, selectedCity }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+export default function CreateRoutePage({ setPage, PAGES }) {
+  const store = useContext(StoreContext);
+  const selectedCity = store.get('selectedCity');
+  const routeDraft = store.get('route');
+  const [name, setName] = useState(routeDraft?.name ?? '');
+  const [title, setTitle] = useState(routeDraft?.title ?? '');
+  const [cover, setCover] = useState(routeDraft?.cover ?? null);
   const [durationDays, setDurationDays] = useState(1);
 
-  function goBack() {
-    setPage(PAGES.ROUTES);
+  const goBack = useCallback(() => setPage(PAGES.ROUTES), [setPage, PAGES]);
+  useMaxBackButton(goBack);
+
+  function goToPlaces() {
+    store.set('route', { name: name.trim(), title: title.trim(), cover });
+    setPage(PAGES.EDIT);
   }
 
   return (
@@ -24,15 +34,20 @@ export default function CreateRoutePage({ setPage, PAGES, selectedCity }) {
         <form className="create-route-page__form" onSubmit={(e) => e.preventDefault()}>
           <label className="create-route-page__field">
             <span>Обложка маршрута</span>
-            <input type="file" accept="image/*" />
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => setCover(e.target.files[0] ?? null)}
+            />
+            {cover && <span className="create-route-page__file">Выбрано: {cover.name}</span>}
           </label>
 
           <label className="create-route-page__field">
             <span>Название маршрута</span>
             <input
               type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Например, «Исторический центр за день»"
             />
           </label>
@@ -45,8 +60,8 @@ export default function CreateRoutePage({ setPage, PAGES, selectedCity }) {
           <label className="create-route-page__field">
             <span>Описание</span>
             <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               rows={4}
               placeholder="Для кого этот маршрут, что стоит знать заранее"
             />
@@ -74,12 +89,14 @@ export default function CreateRoutePage({ setPage, PAGES, selectedCity }) {
             </label>
           </fieldset>
 
-          <button type="button" className="create-route-page__next" disabled>
+          <button
+            type="button"
+            className="create-route-page__next"
+            disabled={!name.trim() || !title.trim()}
+            onClick={goToPlaces}
+          >
             Далее - расставить места на карте
           </button>
-          <p className="create-route-page__note">
-            Расстановка точек маршрута на карте пока в разработке.
-          </p>
         </form>
       </div>
     </main>

@@ -1,37 +1,36 @@
-const priceFormatter = new Intl.NumberFormat('ru-RU', {
-  style: 'currency',
-  currency: 'RUB',
-  maximumFractionDigits: 0,
-});
+import LikeButton from '../../components/LikeButton/LikeButton';
+import formatPrice from '../../utils/formatPrice';
+import getImageUrl from '../../utils/getImageUrl';
+import PhotoCredit from '../../components/PhotoCredit/PhotoCredit';
 
-export default function RouteCard({ route, selected, onSelect }) {
-  const { guid, title, cost, x, y } = route;
+export default function RouteCard({ route, onOpen, onLikeChange }) {
+  const { guid, name, title, cost, photo_url, photo_credit, likes, liked } = route;
   const titleId = `route-title-${guid}`;
 
   return (
-    <article className={`route-card${selected ? ' route-card--selected' : ''}`} aria-labelledby={titleId}>
-      <h2 id={titleId}>{title}</h2>
+    <article className="route-card" aria-labelledby={titleId}>
+      {photo_url && (
+        <img className="route-card__cover" src={getImageUrl(photo_url)} alt="" />
+      )}
+      <PhotoCredit credit={photo_credit} className="route-card__credit" />
+      <h2 id={titleId}>{name || title}</h2>
       <dl className="route-card__details">
         <div>
           <dt>Цена</dt>
-          <dd className="route-card__price">{!cost ? 'Бесплатно' : priceFormatter.format(cost)}</dd>
-        </div>
-        <div>
-          <dt>Координаты</dt>
-          <dd className="route-card__coordinates">
-            {x}, {y}
-          </dd>
+          <dd className="route-card__price">{formatPrice(cost)}</dd>
         </div>
       </dl>
-      <button
-        className="route-card__button"
-        type="button"
-        aria-pressed={selected}
-        aria-label={`${selected ? 'Выбран маршрут' : 'Выбрать маршрут'}: ${title}`}
-        onClick={() => onSelect(guid)}
-      >
-        {selected ? 'Маршрут выбран' : 'Выбрать маршрут'}
-      </button>
+      <div className="route-card__actions">
+        <LikeButton routeGuid={guid} liked={liked} likes={likes} onChange={onLikeChange} />
+        <button
+          className="route-card__button"
+          type="button"
+          aria-label={`Открыть маршрут: ${name || title}`}
+          onClick={() => onOpen(route)}
+        >
+          Подробнее
+        </button>
+      </div>
     </article>
   );
 }

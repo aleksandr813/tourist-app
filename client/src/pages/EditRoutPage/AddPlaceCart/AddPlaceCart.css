@@ -9,6 +9,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
+  overflow-y: auto;
   background: rgba(13, 13, 26, 0.6);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -18,6 +19,7 @@
 .place-cart {
   width: 100%;
   max-width: 380px;
+  margin: auto;
   padding: 28px;
   border: 1px solid rgba(168, 85, 247, 0.55);
   border-radius: 20px;
@@ -54,6 +56,33 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+.place-cart__photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 140px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.08);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: border-color 0.25s ease;
+}
+
+.place-cart__photo:hover {
+  border-color: #ffffff;
+}
+
+.place-cart__photo-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .place-cart__input {
   width: 100%;
   padding: 18px 22px;
@@ -67,6 +96,10 @@
   border-radius: 16px;
   transition: border-color 0.25s ease, box-shadow 0.25s ease,
     background-color 0.25s ease;
+}
+
+.place-cart__textarea {
+  resize: vertical;
 }
 
 .place-cart__input::placeholder {
@@ -124,6 +157,13 @@
   transform: translateY(0);
 }
 
+.place-cart__button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
 .place-cart__button:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 3px;
@@ -165,6 +205,10 @@
 
   .place-cart__actions {
     flex-direction: column-reverse;
+  }
+
+  .place-cart__photo {
+    height: 110px;
   }
 
   .place-cart__button {

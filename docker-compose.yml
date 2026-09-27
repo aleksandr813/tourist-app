@@ -1,0 +1,35 @@
+services:
+  server:
+    build: ./server
+    restart: unless-stopped
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN:-}
+      ALLOW_ANONYMOUS_ROUTES: ${ALLOW_ANONYMOUS_ROUTES:-false}
+    volumes:
+      - server-data:/app/data
+      - server-uploads:/app/public/uploads
+
+  client:
+    build:
+      context: ./client
+      args:
+        REACT_APP_HOST: /api
+        REACT_APP_STATIC_HOST: ""
+        REACT_APP_MAPGL_KEY: ${MAPGL_KEY:-}
+        REACT_APP_BOT_NAME: ${BOT_NAME:-}
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "127.0.0.1:${CLIENT_PORT:-8080}:80"
+
+  bot:
+    build: ./bot
+    restart: on-failure
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN:-}
+      BOT_NAME: ${BOT_NAME:-}
+
+volumes:
+  server-data:
+  server-uploads:

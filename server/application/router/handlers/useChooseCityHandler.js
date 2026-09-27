@@ -5,7 +5,7 @@ module.exports = (mediator, answer) => {
 
         if (!city){
 
-            return res.send(answer.bad(67));
+            return answer.bad(res, 67);
         }
         return res.send(answer.good(true));
     };

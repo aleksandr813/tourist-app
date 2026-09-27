@@ -1,0 +1,37 @@
+{
+  "description": "Данные для воспроизводимой проверки. Все маршруты и места уже есть в базе server/application/modules/db/data.db, которая копируется в Docker-том при первом запуске.",
+  "cities": [
+    { "city": "Москва", "guid": "cefae78b-eb96-43e3-b8cb-17833c05a73b", "routes": 15, "pages": 2 },
+    { "city": "Казань", "guid": "2f8f462b-7bf7-4c9c-8796-7a1afe7d13c4", "routes": 10, "pages": 1 }
+  ],
+  "routes": [
+    { "guid": "a1b294f4-8432-46d5-b318-956f8a87568f", "name": "Сердце Москвы: Красная площадь и Зарядье", "city": "Москва", "places": 4 },
+    { "guid": "f3dda26b-0b7a-4d09-95bb-3abe8afb49dc", "name": "Казанский кремль", "city": "Казань", "places": 4 }
+  ],
+  "share_link_example": "https://max.ru/<BOT_NAME>?startapp=route_f3dda26b-0b7a-4d09-95bb-3abe8afb49dc",
+  "test_users": [
+    {
+      "role": "max_user",
+      "user_id": 100000001,
+      "how_to_get_init_data": "node test-data/make-init-data.js <BOT_TOKEN> 100000001"
+    },
+    {
+      "role": "dev_user",
+      "user_id": "dev-user",
+      "note": "Используется автоматически при npm start вне MAX, если на сервере не задан BOT_TOKEN"
+    }
+  ],
+  "add_route_request": {
+    "route": {
+      "name": "Проверочный маршрут",
+      "title": "Маршрут для проверки API",
+      "cost": 0,
+      "x": 49.10724,
+      "y": 55.797442,
+      "city_guid": "2f8f462b-7bf7-4c9c-8796-7a1afe7d13c4"
+    },
+    "places": [
+      { "name": "Казанский кремль", "x": 49.10724, "y": 55.797442, "price": 0, "description": "Проверочное место" }
+    ]
+  }
+}

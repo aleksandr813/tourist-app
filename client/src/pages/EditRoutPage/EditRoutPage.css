@@ -30,6 +30,28 @@
   height: 100%;
 }
 
+.edit-route__map--selecting,
+.edit-route__map--selecting * {
+  cursor: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='32' viewBox='0 0 28 32'%3E%3Cpath d='M14 31C14 31 3 19.5 3 12a11 11 0 0 1 22 0c0 7.5-11 19-11 19z' fill='%238a2be2' stroke='%23ffffff' stroke-width='2'/%3E%3Ccircle cx='14' cy='12' r='4' fill='%23ffffff'/%3E%3C/svg%3E") 14 31, crosshair !important;
+}
+
+.edit-route__hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 10;
+  width: max-content;
+  max-width: calc(100vw - 40px);
+  margin: 0;
+  padding: 14px 20px;
+  transform: translateX(-50%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  text-align: center;
+  color: #ffffff;
+  pointer-events: none;
+}
+
 /* Плавающая панель */
 .edit-route__panel {
   position: absolute;
@@ -174,6 +196,14 @@
   border-radius: 3px;
 }
 
+.edit-route__publish-error {
+  margin: 0;
+  padding: 14px 18px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: #ff8a8a;
+}
+
 /* Сообщение об ошибке карты */
 .edit-route__error {
   display: flex;
@@ -207,6 +237,11 @@
 
   .points-list {
     max-height: 180px;
+  }
+
+  .edit-route__hint {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    font-size: 13px;
   }
 }
 

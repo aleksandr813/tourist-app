@@ -4,6 +4,7 @@ import PageManager from './pages/PageManager';
 import Server from './services/Server/Server';
 import React from 'react';
 import Store from './services/Store/Store';
+import Max from './services/Max/Max';
 
 export const ServerContext = React.createContext(null);
 export const StoreContext = React.createContext(null);
@@ -12,6 +13,10 @@ function App() {
 
   const store = new Store();
   const server = new Server(store);
+  const max = new Max();
+
+  store.set("userId", max.getUserId());
+  store.set("initData", max.getInitData());
 
   return (
   <StoreContext.Provider value={store}>

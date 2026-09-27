@@ -96,6 +96,11 @@
   opacity: 0.6;
 }
 
+.create-route-page__file {
+  font-size: 13px;
+  color: #ffffff;
+}
+
 .create-route-page__duration {
   border: none;
   padding: 0;
@@ -130,16 +135,12 @@
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  cursor: not-allowed;
-  opacity: 0.4;
+  cursor: pointer;
 }
 
-.create-route-page__note {
-  margin: -8px 0 0;
-  color: #c5c5dc;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 13px;
-  text-align: center;
+.create-route-page__next:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
 }
 
 @media (max-width: 600px) {
