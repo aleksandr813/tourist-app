@@ -28,7 +28,7 @@ docker compose version
 ## 2. Загрузка проекта
 
 ```bash
-git clone <адрес репозитория> tourist-app
+git clone https://github.com/aleksandr813/tourist-app
 cd tourist-app
 ```
 
