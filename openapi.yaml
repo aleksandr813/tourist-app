@@ -1,0 +1,491 @@
+openapi: 3.0.3
+info:
+  title: Маршруты API
+  version: 1.0.0
+  description: |
+    API мини-приложения MAX «Маршруты»: города, туристические маршруты, места, лайки и загрузка фото.
+
+    Успешный ответ всегда имеет вид `{ "result": "ok", "data": ... }`,
+    ошибка - `{ "result": "error", "error": { "code", "message" } }` с соответствующим HTTP-статусом.
+
+    Пользователь определяется по заголовку `X-Max-Init-Data` (строка `window.WebApp.initData` из MAX Bridge).
+    Если на сервере задан `BOT_TOKEN`, подпись проверяется, а id из тела запроса и параметров игнорируется.
+    Если `BOT_TOKEN` не задан (локальная разработка), сервер использует id из параметров `user`, `user_id`, `author_id`.
+servers:
+  - url: https://{domain}/api
+    variables:
+      domain:
+        default: example.ru
+  - url: http://localhost:8080/api
+    description: Docker Compose на локальной машине
+  - url: http://localhost:3003/api
+    description: Сервер без Docker
+tags:
+  - name: Города
+  - name: Маршруты
+  - name: Лайки
+  - name: Файлы
+paths:
+  /getCities:
+    get:
+      tags: [Города]
+      summary: Список всех городов
+      operationId: getCities
+      responses:
+        '200':
+          description: Города
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/City'
+  /chooseCity/{city}:
+    get:
+      tags: [Города]
+      summary: Подтверждение выбора города
+      operationId: chooseCity
+      parameters:
+        - name: city
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Выбор принят
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      data:
+                        type: boolean
+                        example: true
+  /getRoutes:
+    get:
+      tags: [Маршруты]
+      summary: Маршруты города с пагинацией и сортировкой
+      operationId: getRoutes
+      security:
+        - {}
+        - maxInitData: []
+      parameters:
+        - name: city
+          in: query
+          required: true
+          description: guid города
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: Номер страницы, начиная с 1. Размер страницы - 10.
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: sort
+          in: query
+          required: false
+          description: date - сначала новые, likes - сначала популярные. Неизвестное значение обрабатывается как date.
+          schema:
+            type: string
+            enum: [date, likes]
+            default: date
+        - name: user
+          in: query
+          required: false
+          description: id пользователя MAX (используется, только если BOT_TOKEN не задан)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Страница маршрутов
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RoutesPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /getRoute:
+    get:
+      tags: [Маршруты]
+      summary: Один маршрут с лайками (для ссылки «Поделиться»)
+      operationId: getRoute
+      security:
+        - {}
+        - maxInitData: []
+      parameters:
+        - name: route
+          in: query
+          required: true
+          description: guid маршрута
+          schema:
+            type: string
+        - name: user
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Маршрут
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Route'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /getPlaces:
+    get:
+      tags: [Маршруты]
+      summary: Места маршрута в порядке посещения
+      operationId: getPlaces
+      parameters:
+        - name: route
+          in: query
+          required: true
+          description: guid маршрута
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Места
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Place'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /addRoute:
+    post:
+      tags: [Маршруты]
+      summary: Публикация маршрута
+      description: |
+        Автор определяется по `X-Max-Init-Data`. Без пользователя маршрут принимается,
+        только если на сервере включено `ALLOW_ANONYMOUS_ROUTES=true` (автор `anonymous`), иначе 401.
+      operationId: addRoute
+      security:
+        - maxInitData: []
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddRouteRequest'
+      responses:
+        '200':
+          description: guid созданного маршрута
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      data:
+                        type: string
+                        format: uuid
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /toggleLike:
+    post:
+      tags: [Лайки]
+      summary: Поставить или снять лайк
+      operationId: toggleLike
+      security:
+        - maxInitData: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [route_guid]
+              properties:
+                route_guid:
+                  type: string
+                user_id:
+                  type: string
+                  description: Используется, только если BOT_TOKEN не задан
+      responses:
+        '200':
+          description: Новое состояние лайка
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LikeState'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /uploadImage:
+    post:
+      tags: [Файлы]
+      summary: Загрузка фото маршрута или места
+      operationId: uploadImage
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image]
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: JPEG, PNG или WebP до 5 МБ
+      responses:
+        '200':
+          description: Путь к загруженному файлу
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      data:
+                        type: string
+                        example: /uploads/0b8e7c1e-2f7a-4f39-9a52-3a1f6f0f8c11.jpg
+        '400':
+          $ref: '#/components/responses/BadRequest'
+components:
+  securitySchemes:
+    maxInitData:
+      type: apiKey
+      in: header
+      name: X-Max-Init-Data
+      description: Строка window.WebApp.initData из MAX Bridge
+  responses:
+    BadRequest:
+      description: Некорректные параметры (код 67, 68 или 69)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Пользователь не определён или подпись MAX неверна (код 11)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Маршрут или метод не найден (код 25 или 404)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Ok:
+      type: object
+      required: [result, data]
+      properties:
+        result:
+          type: string
+          enum: [ok]
+        data: {}
+    Error:
+      type: object
+      required: [result, error]
+      properties:
+        result:
+          type: string
+          enum: [error]
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: integer
+              enum: [11, 23, 25, 67, 68, 69, 404, 9000]
+            message:
+              type: string
+    City:
+      type: object
+      required: [guid, city, x, y]
+      properties:
+        guid:
+          type: string
+        city:
+          type: string
+        region:
+          type: string
+          nullable: true
+        x:
+          type: number
+          description: Долгота центра города
+        y:
+          type: number
+          description: Широта центра города
+    Route:
+      type: object
+      required: [guid, name, title, cost, author_id, city_guid, likes, liked]
+      properties:
+        guid:
+          type: string
+        name:
+          type: string
+          description: Название
+        title:
+          type: string
+          description: Описание от автора
+        cost:
+          type: number
+          description: Общая цена, сумма цен мест
+        x:
+          type: number
+        y:
+          type: number
+        author_id:
+          type: string
+        city_guid:
+          type: string
+        photo_url:
+          type: string
+          nullable: true
+        photo_credit:
+          type: string
+          nullable: true
+          description: Автор и лицензия фото
+        created_at:
+          type: integer
+          description: Время публикации, мс
+        likes:
+          type: integer
+        liked:
+          type: integer
+          enum: [0, 1]
+          description: 1, если текущий пользователь поставил лайк
+    RoutesPage:
+      type: object
+      required: [routes, pagesCount]
+      properties:
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+        pagesCount:
+          type: integer
+    Place:
+      type: object
+      required: [guid, name, x, y, price, route_guid]
+      properties:
+        guid:
+          type: string
+        name:
+          type: string
+        x:
+          type: number
+          description: Долгота
+        y:
+          type: number
+          description: Широта
+        price:
+          type: number
+          description: 0 - бесплатно
+        description:
+          type: string
+        route_guid:
+          type: string
+        photo_url:
+          type: string
+          nullable: true
+        photo_credit:
+          type: string
+          nullable: true
+    NewPlace:
+      type: object
+      required: [name, x, y, price]
+      properties:
+        name:
+          type: string
+        x:
+          type: number
+        y:
+          type: number
+        price:
+          type: number
+        description:
+          type: string
+        photo_url:
+          type: string
+          nullable: true
+    AddRouteRequest:
+      type: object
+      required: [route, places]
+      properties:
+        route:
+          type: object
+          required: [name, title, cost, x, y, city_guid]
+          properties:
+            name:
+              type: string
+            title:
+              type: string
+            cost:
+              type: number
+            x:
+              type: number
+            y:
+              type: number
+            city_guid:
+              type: string
+            author_id:
+              type: string
+              nullable: true
+              description: Используется, только если BOT_TOKEN не задан
+            photo_url:
+              type: string
+              nullable: true
+        places:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/NewPlace'
+    LikeState:
+      type: object
+      required: [liked, likes]
+      properties:
+        liked:
+          type: boolean
+        likes:
+          type: integer

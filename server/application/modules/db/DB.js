@@ -2,6 +2,13 @@ const sqlite3 = require('sqlite3').verbose();
 const ORM = require('./ORM');
 const cities = require('./seeds/cities.json');
 
+const ROUTES_SELECT = `
+    SELECT routes.*,
+           COUNT(likes.user_id) AS likes,
+           COALESCE(MAX(likes.user_id = ?), 0) AS liked
+    FROM routes
+    LEFT JOIN likes ON likes.route_guid = routes.guid`;
+
 const ROUTES_ORDER = {
     date: 'routes.created_at DESC',
     likes: 'likes DESC, routes.created_at DESC',
@@ -9,7 +16,7 @@ const ROUTES_ORDER = {
 
 class DB {
     constructor({ DATABASE }) {
-        this.db = new sqlite3.Database(`${__dirname}/${DATABASE.NAME}`);
+        this.db = new sqlite3.Database(`${DATABASE.DIR ?? __dirname}/${DATABASE.NAME}`);
         this.orm = new ORM(this.db);
         this.createTables();
     }
@@ -38,6 +45,7 @@ class DB {
                     photo_url TEXT,
                     city_guid TEXT,
                     created_at INTEGER,
+                    photo_credit TEXT,
                     PRIMARY KEY(guid)
                 )
             `);
@@ -51,6 +59,7 @@ class DB {
                 description	TEXT NOT NULL,
                 route_guid  TEXT,
                 photo_url   TEXT,
+                photo_credit TEXT,
                 FOREIGN KEY("route_guid") REFERENCES "routes"("guid")
                 )
             `);
@@ -79,11 +88,7 @@ class DB {
 
     async getRoutes({ cityGuid, userId, sort, limit, offset }) {
         return await this.orm.raw(
-            `SELECT routes.*,
-                    COUNT(likes.user_id) AS likes,
-                    COALESCE(MAX(likes.user_id = ?), 0) AS liked
-             FROM routes
-             LEFT JOIN likes ON likes.route_guid = routes.guid
+            `${ROUTES_SELECT}
              WHERE routes.city_guid = ?
              GROUP BY routes.guid
              ORDER BY ${ROUTES_ORDER[sort] ?? ROUTES_ORDER.date}
@@ -98,6 +103,11 @@ class DB {
 
     async getRoute(guid) {
         return await this.orm.get('routes', { guid });
+    }
+
+    async getRouteWithLikes(guid, userId) {
+        const routes = await this.orm.raw(`${ROUTES_SELECT} WHERE routes.guid = ? GROUP BY routes.guid`, [userId, guid]);
+        return routes[0] ?? null;
     }
 
     async getLike(like) {

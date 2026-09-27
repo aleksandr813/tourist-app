@@ -6,7 +6,7 @@ module.exports = (mediator, answer) => {
         const { route } = req.query;
 
         if (!isString(route)) {
-            return res.send(answer.bad(67));
+            return answer.bad(res, 67);
         }
 
         const places = await mediator.get(GET_PLACES, { routeGuid: route });

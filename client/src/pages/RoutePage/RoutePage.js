@@ -1,12 +1,17 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { ServerContext, StoreContext } from '../../App';
 import LikeButton from '../../components/LikeButton/LikeButton';
+import PhotoCredit from '../../components/PhotoCredit/PhotoCredit';
+import useMaxBackButton from '../../hooks/useMaxBackButton';
+import Max from '../../services/Max/Max';
 import formatPrice from '../../utils/formatPrice';
 import getImageUrl from '../../utils/getImageUrl';
 import PlaceCard from './PlaceCard/PlaceCard';
 import RouteMap from './RouteMap/RouteMap';
 
 import './RoutePage.css';
+
+const max = new Max();
 
 export default function RoutePage({ setPage, PAGES }) {
   const server = useContext(ServerContext);
@@ -17,6 +22,18 @@ export default function RoutePage({ setPage, PAGES }) {
   const [openedPlace, setOpenedPlace] = useState(null);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [focusedPlace, setFocusedPlace] = useState(null);
+  const [loadError, setLoadError] = useState(null);
+
+  const goBack = useCallback(() => {
+    if (openedPlace) {
+      setOpenedPlace(null);
+    } else if (isMapOpen) {
+      setIsMapOpen(false);
+    } else {
+      setPage(PAGES.ROUTES);
+    }
+  }, [openedPlace, isMapOpen, setPage, PAGES]);
+  useMaxBackButton(goBack);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,8 +43,12 @@ export default function RoutePage({ setPage, PAGES }) {
       if (cancelled) {
         return;
       }
-      setPlaces(placesList ?? []);
       setIsLoading(false);
+      if (!placesList) {
+        setLoadError('Не удалось загрузить места маршрута');
+        return;
+      }
+      setPlaces(placesList);
     }
 
     getPlaces();
@@ -82,19 +103,31 @@ export default function RoutePage({ setPage, PAGES }) {
         {route.photo_url && (
           <img className="route-page__cover" src={getImageUrl(route.photo_url)} alt="" />
         )}
+        <PhotoCredit credit={route.photo_credit} className="route-page__credit" />
 
         <header className="route-page__header">
           <h1>{route.name || route.title}</h1>
           {route.name && <p className="route-page__description">{route.title}</p>}
           <div className="route-page__summary">
             <p className="route-page__price">{formatPrice(route.cost)}</p>
-            <LikeButton
-              routeGuid={route.guid}
-              liked={route.liked}
-              likes={route.likes}
-              onChange={updateLikes}
-            />
+            <div className="route-page__actions">
+              {max.canShare() && (
+                <button type="button" className="route-page__share" onClick={() => max.shareRoute(route)}>
+                  Поделиться
+                </button>
+              )}
+              <LikeButton
+                routeGuid={route.guid}
+                liked={route.liked}
+                likes={route.likes}
+                onChange={updateLikes}
+              />
+            </div>
           </div>
+          <p className="route-page__note">
+            {route.created_at && `Опубликован ${new Date(route.created_at).toLocaleDateString('ru-RU')}. `}
+            Цены примерные и указаны автором маршрута.
+          </p>
         </header>
 
         <button
@@ -112,7 +145,8 @@ export default function RoutePage({ setPage, PAGES }) {
           </h2>
 
           {isLoading && <p className="route-page__status">Загружаем места…</p>}
-          {!isLoading && places.length === 0 && (
+          {loadError && <p className="route-page__status route-page__status--error" role="alert">{loadError}</p>}
+          {!isLoading && !loadError && places.length === 0 && (
             <p className="route-page__status">В маршруте пока нет мест</p>
           )}
 

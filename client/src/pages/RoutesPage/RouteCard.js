@@ -1,9 +1,10 @@
 import LikeButton from '../../components/LikeButton/LikeButton';
 import formatPrice from '../../utils/formatPrice';
 import getImageUrl from '../../utils/getImageUrl';
+import PhotoCredit from '../../components/PhotoCredit/PhotoCredit';
 
 export default function RouteCard({ route, onOpen, onLikeChange }) {
-  const { guid, name, title, cost, photo_url, likes, liked } = route;
+  const { guid, name, title, cost, photo_url, photo_credit, likes, liked } = route;
   const titleId = `route-title-${guid}`;
 
   return (
@@ -11,6 +12,7 @@ export default function RouteCard({ route, onOpen, onLikeChange }) {
       {photo_url && (
         <img className="route-card__cover" src={getImageUrl(photo_url)} alt="" />
       )}
+      <PhotoCredit credit={photo_credit} className="route-card__credit" />
       <h2 id={titleId}>{name || title}</h2>
       <dl className="route-card__details">
         <div>

@@ -19,7 +19,7 @@ module.exports = (answer, common, uploads) => {
     return (req, res) => {
         upload(req, res, (error) => {
             if (error || !req.file) {
-                return res.send(answer.bad(68));
+                return answer.bad(res, 68);
             }
             return res.send(answer.good(`/${uploads.DIR}/${req.file.filename}`));
         });

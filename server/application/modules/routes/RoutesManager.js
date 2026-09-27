@@ -4,9 +4,11 @@ class RoutesManager extends BaseManager{
     constructor(params) {
         super(params);
         this.pageSize = params.pageSize;
+        this.anonymousAuthorId = params.anonymousAuthorId;
 
         this.mediator.set(this.TRIGGERS.GET_CITIES, (data) => this.triggerGetCities());
         this.mediator.set(this.TRIGGERS.GET_ROUTES, (data) => this.triggerGetRoutes(data));
+        this.mediator.set(this.TRIGGERS.GET_ROUTE, (data) => this.triggerGetRoute(data.routeGuid, data.userId));
         this.mediator.set(this.TRIGGERS.GET_PLACES, (data) => this.triggerGetPlaces(data.routeGuid));
         this.mediator.set(this.TRIGGERS.ADD_ROUTE, (data) => this.triggerAddRoute(data.route, data.places));
         this.mediator.set(this.TRIGGERS.TOGGLE_LIKE, (data) => this.triggerToggleLike(data.routeGuid, data.userId));
@@ -30,13 +32,22 @@ class RoutesManager extends BaseManager{
         return { routes, pagesCount: Math.ceil(total / this.pageSize) };
     }
 
+    triggerGetRoute(routeGuid, userId) {
+        return this.db.getRouteWithLikes(routeGuid, userId);
+    }
+
     triggerGetPlaces(routeGuid) {
         return this.db.getPlaces(routeGuid);
     }
 
     async triggerAddRoute(route, places) {
+        const authorId = route.author_id ?? this.anonymousAuthorId;
+        if (!authorId) {
+            return null;
+        }
+
         const routeGuid = this.common.guid();
-        await this.db.addRoute({ guid: routeGuid, ...route, created_at: Date.now() });
+        await this.db.addRoute({ guid: routeGuid, ...route, author_id: authorId, created_at: Date.now() });
         await this.db.addPlaces('places', places.map((place) => ({
             guid: this.common.guid(),
             ...place,

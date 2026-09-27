@@ -16,6 +16,7 @@ function App() {
   const max = new Max();
 
   store.set("userId", max.getUserId());
+  store.set("initData", max.getInitData());
 
   return (
   <StoreContext.Provider value={store}>

@@ -1,9 +1,10 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Directions } from '@2gis/mapgl-directions';
 import { load } from "@2gis/mapgl";
 import { ServerContext, StoreContext } from "../../App";
 import CONFIG from "../../Config";
 import RouteToggleButton from "../../components/RouteToggleButton/RouteToggleButton";
+import useMaxBackButton from "../../hooks/useMaxBackButton";
 import AddPlaceButton from "./AddPlaceButton/AddPlaceButton";
 import AddPlaceCart from "./AddPlaceCart/AddPlaceCart";
 
@@ -17,6 +18,14 @@ const MARKER_ICON =
         </svg>`
     );
 
+const createMarker = (mapglAPI, map, point) =>
+    new mapglAPI.Marker(map, {
+        coordinates: [point.lng, point.lat],
+        icon: MARKER_ICON,
+        size: [28, 28],
+        anchor: [14, 14],
+    });
+
 export default function EditRoutPage({ setPage, PAGES }) {
     const containerRef = useRef(null);
     const mapRef = useRef(null);
@@ -25,17 +34,28 @@ export default function EditRoutPage({ setPage, PAGES }) {
     const markersRef = useRef([]);
     
     
+    const store = useContext(StoreContext);
+    const server = useContext(ServerContext);
+    const selectedCity = store.get("selectedCity");
+
     const [mapError, setMapError] = useState(null);
-    const [points, setPoints] = useState([]);
+    const [isMapReady, setIsMapReady] = useState(false);
+    const [points, setPoints] = useState(store.get("points") ?? []);
     const [draftPoint, setDraftPoint] = useState(null);
     const [publishError, setPublishError] = useState(null);
     const [isSelecting, setIsSelecting] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
     const [isRouteVisible, setIsRouteVisible] = useState(true);
 
-    const store = useContext(StoreContext);
-    const server = useContext(ServerContext);
-    const selectedCity = store.get("selectedCity");
+    const goBack = useCallback(() => {
+        if (draftPoint) {
+            setDraftPoint(null);
+            return;
+        }
+        store.set("selecting", "idle");
+        setPage(PAGES.CREATE_ROUTE);
+    }, [draftPoint, store, setPage, PAGES]);
+    useMaxBackButton(goBack);
 
     useEffect(() => {
         let cancelled = false;
@@ -56,6 +76,9 @@ export default function EditRoutPage({ setPage, PAGES }) {
                     directionsApiKey: CONFIG.MAPGL_KEY,
                 });
                 directionsRef.current = directions;
+
+                markersRef.current = (store.get("points") ?? []).map((point) => createMarker(mapglAPI, map, point));
+                setIsMapReady(true);
 
                 map.on("click", (e) => {
                     if (store.get("selecting") !== "waiting") return;
@@ -104,7 +127,7 @@ export default function EditRoutPage({ setPage, PAGES }) {
         } else {
             directions.clear();
         }
-    }, [points, isRouteVisible]);
+    }, [points, isRouteVisible, isMapReady]);
 
     const handleSavePoint = (point) => {
         const newPoints = [...(store.get("points") || []), point];
@@ -115,13 +138,7 @@ export default function EditRoutPage({ setPage, PAGES }) {
         const map = mapRef.current;
         const mapglAPI = mapglAPIRef.current
         if (map && mapglAPI) {
-            const marker = new mapglAPI.Marker(map, {
-                coordinates: [point.lng, point.lat],
-                icon: MARKER_ICON,
-                size: [28, 28],
-                anchor: [14, 14],
-            });
-            markersRef.current.push(marker);
+            markersRef.current.push(createMarker(mapglAPI, map, point));
         }
     };
 
@@ -219,6 +236,9 @@ export default function EditRoutPage({ setPage, PAGES }) {
             )}
 
             <div className="edit-route__panel">
+                <button type="button" className="btn-secondary edit-route__back" onClick={goBack}>
+                    ← Назад к описанию
+                </button>
                 <AddPlaceButton active={isSelecting} onClick={toggleSelecting} />
                 <button className="btn-secondary" onClick={resetRoute}>
                     Сбросить

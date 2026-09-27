@@ -1,5 +1,6 @@
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { StoreContext } from '../../App';
+import useMaxBackButton from '../../hooks/useMaxBackButton';
 import './CreateRoutePage.css';
 
 export default function CreateRoutePage({ setPage, PAGES }) {
@@ -11,9 +12,8 @@ export default function CreateRoutePage({ setPage, PAGES }) {
   const [cover, setCover] = useState(routeDraft?.cover ?? null);
   const [durationDays, setDurationDays] = useState(1);
 
-  function goBack() {
-    setPage(PAGES.ROUTES);
-  }
+  const goBack = useCallback(() => setPage(PAGES.ROUTES), [setPage, PAGES]);
+  useMaxBackButton(goBack);
 
   function goToPlaces() {
     store.set('route', { name: name.trim(), title: title.trim(), cover });

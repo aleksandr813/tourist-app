@@ -1,14 +1,17 @@
 const useChooseCityHandler = require("./useChooseCityHandler");
-const notFoundHandler = require("./notFoundHandler");
+const useNotFoundHandler = require("./useNotFoundHandler");
+const useErrorHandler = require("./useErrorHandler");
 const useGetCitiesHandler = require("./useGetCitiesHandler");
 const useGetRoutesHandler = require("./useGetRoutesHandler");
 const useAddRouteHandler = require("./useAddRouteHandler");
 const useGetPlacesHandler = require("./useGetPlacesHandler");
 const useUploadImageHandler = require("./useUploadImageHandler");
 const useToggleLikeHandler = require("./useToggleLikeHandler");
+const useGetRouteHandler = require("./useGetRouteHandler");
 
 module.exports = {
-    notFoundHandler,
+    useNotFoundHandler,
+    useErrorHandler,
     useChooseCityHandler,
     useGetCitiesHandler,
     useGetRoutesHandler,
@@ -16,4 +19,5 @@ module.exports = {
     useGetPlacesHandler,
     useUploadImageHandler,
     useToggleLikeHandler,
+    useGetRouteHandler,
 };

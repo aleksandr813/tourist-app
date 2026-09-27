@@ -1,10 +1,11 @@
 const { isString, isOptionalString, isNumber, isId } = require('../validators');
+const getUserId = require('../getUserId');
 
 const isValidRoute = (route) =>
     route &&
     isString(route.name) &&
     isString(route.title) &&
-    isId(route.author_id) &&
+    (route.author_id == null || isId(route.author_id)) &&
     isString(route.city_guid) &&
     isNumber(route.cost) &&
     isNumber(route.x) &&
@@ -26,7 +27,7 @@ module.exports = (mediator, answer) => {
         const { route, places } = req.body ?? {};
 
         if (!isValidRoute(route) || !Array.isArray(places) || !places.length || !places.every(isValidPlace)) {
-            return res.send(answer.bad(67));
+            return answer.bad(res, 67);
         }
 
         const routeGuid = await mediator.get(ADD_ROUTE, {
@@ -36,7 +37,7 @@ module.exports = (mediator, answer) => {
                 title: route.title,
                 x: route.x,
                 y: route.y,
-                author_id: String(route.author_id),
+                author_id: await getUserId(mediator, req, route.author_id),
                 city_guid: route.city_guid,
                 photo_url: route.photo_url ?? null,
             },
@@ -49,6 +50,6 @@ module.exports = (mediator, answer) => {
                 photo_url: photo_url ?? null,
             })),
         });
-        return res.send(answer.good(routeGuid));
+        return routeGuid ? res.send(answer.good(routeGuid)) : answer.bad(res, 11);
     };
 };

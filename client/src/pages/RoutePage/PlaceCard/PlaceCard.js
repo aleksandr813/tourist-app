@@ -1,5 +1,6 @@
 import formatPrice from '../../../utils/formatPrice';
 import getImageUrl from '../../../utils/getImageUrl';
+import PhotoCredit from '../../../components/PhotoCredit/PhotoCredit';
 
 import './PlaceCard.css';
 
@@ -20,6 +21,7 @@ export default function PlaceCard({ place, number, onClose, onShowOnMap }) {
         {place.photo_url && (
           <img className="place-card__photo" src={getImageUrl(place.photo_url)} alt="" />
         )}
+        <PhotoCredit credit={place.photo_credit} className="place-card__credit" />
 
         <p className="place-card__number">Место {number}</p>
         <h2 className="place-card__title" id="place-card-title">{place.name}</h2>

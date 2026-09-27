@@ -26,7 +26,7 @@ function findCities(cities, query) {
     return [...startsWithQuery, ...containsQuery].slice(0, SUGGESTIONS_LIMIT);
 }
 
-export default function CitySearch({ cities, value, onChange }) {
+export default function CitySearch({ cities, value, onChange, disabled, placeholder }) {
     const [query, setQuery] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -84,7 +84,8 @@ export default function CitySearch({ cities, value, onChange }) {
                 onKeyDown={handleKeyDown}
                 onFocus={() => setIsOpen(true)}
                 onBlur={() => setIsOpen(false)}
-                placeholder="Начните вводить город..."
+                placeholder={placeholder}
+                disabled={disabled}
                 autoComplete="off"
                 role="combobox"
                 aria-expanded={isListVisible}

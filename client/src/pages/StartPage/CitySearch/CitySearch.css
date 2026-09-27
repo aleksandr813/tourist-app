@@ -26,6 +26,11 @@
   box-shadow: 0 0 24px rgba(138, 43, 226, 0.45);
 }
 
+.city-search__input:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
 .city-search__input:focus {
   outline: none;
   border-color: #a855f7;

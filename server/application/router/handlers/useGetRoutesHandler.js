@@ -1,4 +1,5 @@
 const { isString, isOptionalString } = require('../validators');
+const getUserId = require('../getUserId');
 
 module.exports = (mediator, answer) => {
     const { GET_ROUTES } = mediator.getTriggerTypes();
@@ -13,12 +14,12 @@ module.exports = (mediator, answer) => {
             !Number.isInteger(pageNumber) ||
             pageNumber < 1
         ) {
-            return res.send(answer.bad(67));
+            return answer.bad(res, 67);
         }
 
         const routes = await mediator.get(GET_ROUTES, {
             cityGuid: city,
-            userId: user ?? null,
+            userId: await getUserId(mediator, req, user),
             sort,
             page: pageNumber,
         });

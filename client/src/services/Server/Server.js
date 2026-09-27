@@ -1,7 +1,7 @@
 import CONFIG from "../../Config";
 import Store from "../Store/Store";
 
-const {HOST} = CONFIG;
+const {HOST, INIT_DATA_HEADER} = CONFIG;
 
 export default class Server {   
 
@@ -17,11 +17,14 @@ export default class Server {
 
         const url = `${HOST}/${method}${query ? `?${query}` : ''}`;
 
-        const response = await fetch(url, options);
+        const initData = this.store.get('initData');
+        const headers = initData ? { ...options.headers, [INIT_DATA_HEADER]: initData } : options.headers;
+
+        const response = await fetch(url, { ...options, headers });
         const isJson = response.headers.get('Content-Type')?.includes('application/json');
 
-        if (!response.ok || !isJson) {
-            console.error('Server error:', await response.text());
+        if (!isJson) {
+            console.error('Server error:', response.status);
             return null;
         }
 
@@ -31,6 +34,7 @@ export default class Server {
             return answer.data;
         }
 
+        console.error('Server error:', answer.error?.message ?? response.status);
         return null;
     }
 
@@ -63,6 +67,10 @@ export default class Server {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ route_guid: routeGuid, user_id: userId }),
         });
+    }
+
+    async getRoute(routeGuid, userId) {
+        return await this.request('getRoute', { route: routeGuid, user: userId });
     }
 
     async getPlaces(routeGuid) {

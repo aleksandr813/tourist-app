@@ -1,0 +1,235 @@
+version: "1.0"
+solution: "Маршруты: мини-приложение MAX для поиска и создания туристических маршрутов"
+base_url: "https://example.ru/api"
+roles:
+  - name: guest
+    description: Запросы без заголовка X-Max-Init-Data. Доступны просмотр городов, маршрутов и мест.
+  - name: max_user
+    description: >-
+      Пользователь MAX. Заголовок X-Max-Init-Data содержит строку window.WebApp.initData,
+      подписанную токеном бота. Нужен для лайков и публикации маршрутов.
+test_data: test-data/test-data.json
+checks:
+  - id: get-cities
+    required: true
+    description: Список городов для экрана выбора города
+    method: GET
+    path: /getCities
+    params: {}
+    role: guest
+    expected_status: [200]
+    response:
+      content_type: application/json
+      required_fields: [result, data]
+      schema: "data: массив объектов { guid, city, region, x, y }, result = ok"
+
+  - id: get-routes-by-date
+    required: true
+    description: Первая страница маршрутов Москвы, сначала новые
+    method: GET
+    path: /getRoutes
+    params:
+      query:
+        city: cefae78b-eb96-43e3-b8cb-17833c05a73b
+        page: 1
+        sort: date
+    role: guest
+    expected_status: [200]
+    response:
+      content_type: application/json
+      required_fields: [result, data.routes, data.pagesCount]
+      schema: "data.routes: не более 10 маршрутов с полями guid, name, title, cost, likes, liked; data.pagesCount = 2"
+
+  - id: get-routes-by-likes
+    required: true
+    description: Вторая страница маршрутов Москвы, сначала популярные
+    method: GET
+    path: /getRoutes
+    params:
+      query:
+        city: cefae78b-eb96-43e3-b8cb-17833c05a73b
+        page: 2
+        sort: likes
+    role: guest
+    expected_status: [200]
+    response:
+      content_type: application/json
+      required_fields: [result, data.routes, data.pagesCount]
+      schema: "data.routes: 5 маршрутов"
+
+  - id: get-routes-missing-city
+    required: true
+    description: Запрос без обязательного параметра city
+    method: GET
+    path: /getRoutes
+    params: {}
+    role: guest
+    expected_status: [400]
+    response:
+      content_type: application/json
+      required_fields: [result, error.code, error.message]
+      schema: "result = error, error.code = 67"
+
+  - id: get-route
+    required: true
+    description: Один маршрут (открытие по ссылке «Поделиться»)
+    method: GET
+    path: /getRoute
+    params:
+      query:
+        route: f3dda26b-0b7a-4d09-95bb-3abe8afb49dc
+    role: guest
+    expected_status: [200]
+    response:
+      content_type: application/json
+      required_fields: [result, data.guid, data.name, data.city_guid, data.likes, data.liked]
+      schema: "data.name = Казанский кремль"
+
+  - id: get-route-not-found
+    required: true
+    description: Несуществующий маршрут
+    method: GET
+    path: /getRoute
+    params:
+      query:
+        route: 00000000-0000-0000-0000-000000000000
+    role: guest
+    expected_status: [404]
+    response:
+      content_type: application/json
+      required_fields: [result, error.code]
+      schema: "result = error, error.code = 25"
+
+  - id: get-places
+    required: true
+    description: Места маршрута в порядке посещения
+    method: GET
+    path: /getPlaces
+    params:
+      query:
+        route: f3dda26b-0b7a-4d09-95bb-3abe8afb49dc
+    role: guest
+    expected_status: [200]
+    response:
+      content_type: application/json
+      required_fields: [result, data]
+      schema: "data: 4 места с полями guid, name, x, y, price, description, photo_url, photo_credit"
+
+  - id: toggle-like
+    required: true
+    description: Поставить лайк (повторный вызов снимает лайк)
+    method: POST
+    path: /toggleLike
+    params:
+      headers:
+        Content-Type: application/json
+        X-Max-Init-Data: "<window.WebApp.initData из MAX>"
+      body:
+        route_guid: f3dda26b-0b7a-4d09-95bb-3abe8afb49dc
+    role: max_user
+    expected_status: [200]
+    response:
+      content_type: application/json
+      required_fields: [result, data.liked, data.likes]
+      schema: "data.liked: boolean, data.likes: integer"
+
+  - id: toggle-like-without-user
+    required: true
+    description: Лайк без пользователя MAX
+    method: POST
+    path: /toggleLike
+    params:
+      headers:
+        Content-Type: application/json
+      body:
+        route_guid: f3dda26b-0b7a-4d09-95bb-3abe8afb49dc
+    role: guest
+    expected_status: [401]
+    response:
+      content_type: application/json
+      required_fields: [result, error.code]
+      schema: "result = error, error.code = 11"
+
+  - id: add-route
+    required: true
+    description: Публикация маршрута из одного места в Казани
+    method: POST
+    path: /addRoute
+    params:
+      headers:
+        Content-Type: application/json
+        X-Max-Init-Data: "<window.WebApp.initData из MAX>"
+      body:
+        route:
+          name: "Проверочный маршрут"
+          title: "Маршрут для проверки API"
+          cost: 0
+          x: 49.10724
+          y: 55.797442
+          city_guid: 2f8f462b-7bf7-4c9c-8796-7a1afe7d13c4
+        places:
+          - name: "Казанский кремль"
+            x: 49.10724
+            y: 55.797442
+            price: 0
+            description: "Проверочное место"
+    role: max_user
+    expected_status: [200]
+    response:
+      content_type: application/json
+      required_fields: [result, data]
+      schema: "data: guid нового маршрута"
+
+  - id: add-route-invalid
+    required: true
+    description: Публикация без мест
+    method: POST
+    path: /addRoute
+    params:
+      headers:
+        Content-Type: application/json
+      body:
+        route:
+          name: "Без мест"
+          title: "Некорректный запрос"
+          cost: 0
+          x: 49.1
+          y: 55.8
+          city_guid: 2f8f462b-7bf7-4c9c-8796-7a1afe7d13c4
+        places: []
+    role: guest
+    expected_status: [400]
+    response:
+      content_type: application/json
+      required_fields: [result, error.code]
+      schema: "result = error, error.code = 67"
+
+  - id: upload-image
+    required: false
+    description: Загрузка фото (multipart/form-data, поле image, JPEG/PNG/WebP до 5 МБ)
+    method: POST
+    path: /uploadImage
+    params:
+      headers:
+        Content-Type: multipart/form-data
+      body:
+        image: "<файл изображения>"
+    role: guest
+    expected_status: [200, 400]
+    response:
+      content_type: application/json
+      required_fields: [result]
+      schema: "200: data = /uploads/<guid>.<ext>; 400: error.code = 68"
+
+  - id: unknown-method
+    required: false
+    description: Неизвестный метод API
+    method: GET
+    path: /unknownMethod
+    params: {}
+    role: guest
+    expected_status: [404]
+    response:
+      content_type: application/json
+      required_fields: [result, error.code]
+      schema: "result = error, error.code = 404"

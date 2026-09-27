@@ -1,6 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import RouteCard from './RouteCard';
 import { ServerContext, StoreContext } from '../../App';
+import useMaxBackButton from '../../hooks/useMaxBackButton';
 import './RoutesPage.css';
 
 const SORTS = [
@@ -17,6 +18,11 @@ export default function RoutesPage({ setPage, PAGES }) {
   const [page, setPageNumber] = useState(store.get('routesPage') ?? 1);
   const [pagesCount, setPagesCount] = useState(0);
   const [loadError, setLoadError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [attempt, setAttempt] = useState(0);
+
+  const goToCities = useCallback(() => setPage(PAGES.START), [setPage, PAGES]);
+  useMaxBackButton(goToCities);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,6 +32,8 @@ export default function RoutesPage({ setPage, PAGES }) {
         return;
       }
 
+      setIsLoading(true);
+      setLoadError(null);
       const routesPage = await server.getRoutesList({
         city: selectedCity.guid,
         user: store.get('userId'),
@@ -36,6 +44,7 @@ export default function RoutesPage({ setPage, PAGES }) {
         return;
       }
 
+      setIsLoading(false);
       if (!routesPage) {
         setLoadError('Не удалось загрузить маршруты');
         return;
@@ -54,7 +63,7 @@ export default function RoutesPage({ setPage, PAGES }) {
     return () => {
       cancelled = true;
     };
-  }, [sort, page]);
+  }, [sort, page, attempt]);
 
   function changeSort(value) {
     setSort(value);
@@ -74,6 +83,9 @@ export default function RoutesPage({ setPage, PAGES }) {
     <main className="routes-page">
       <div className="routes-page__content">
         <header className="routes-page__header">
+          <button type="button" className="routes-page__change-city" onClick={goToCities}>
+            ← Сменить город
+          </button>
           <h1>{selectedCity ? `Маршруты - ${selectedCity.city}` : 'Выберите маршрут'}</h1>
           <p>Найдите идею для прогулки и отправляйтесь открывать город.</p>
         </header>
@@ -92,7 +104,18 @@ export default function RoutesPage({ setPage, PAGES }) {
           ))}
         </div>
 
-        {loadError && <p className="routes-page__error" role="alert">{loadError}</p>}
+        {loadError && (
+          <div className="routes-page__error" role="alert">
+            <p>{loadError}</p>
+            <button type="button" className="routes-page__page-button" onClick={() => setAttempt(attempt + 1)}>
+              Повторить
+            </button>
+          </div>
+        )}
+
+        {isLoading && !loadError && (
+          <p className="routes-page__status" role="status">Загружаем маршруты...</p>
+        )}
 
         {routes.length > 0 ? (
           <ul className="routes-page__list" aria-label="Доступные маршруты">
@@ -107,7 +130,7 @@ export default function RoutesPage({ setPage, PAGES }) {
             ))}
           </ul>
         ) : (
-          !loadError && <p className="routes-page__empty">Пока нет маршрутов в этом городе.</p>
+          !loadError && !isLoading && <p className="routes-page__empty">Пока нет маршрутов в этом городе.</p>
         )}
 
         {pagesCount > 1 && (

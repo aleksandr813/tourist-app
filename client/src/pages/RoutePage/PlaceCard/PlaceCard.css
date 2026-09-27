@@ -53,6 +53,10 @@
   border-radius: 20px 20px 0 0;
 }
 
+.place-card__credit {
+  margin: -12px 0 16px;
+}
+
 .place-card__number {
   margin: 0 0 8px;
   font-size: 12px;
