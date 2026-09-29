@@ -2,6 +2,7 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import RouteCard from './RouteCard';
 import { ServerContext, StoreContext } from '../../App';
 import useMaxBackButton from '../../hooks/useMaxBackButton';
+import UserRoutesPage from '../UserRoutesPage/UserRoutesPages';
 import './RoutesPage.css';
 
 const SORTS = [
@@ -23,6 +24,11 @@ export default function RoutesPage({ setPage, PAGES }) {
 
   const goToCities = useCallback(() => setPage(PAGES.START), [setPage, PAGES]);
   useMaxBackButton(goToCities);
+
+  const goToUserRoutes = useCallback(
+    () => setPage(PAGES.USERROUTE),
+    [setPage, PAGES]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -79,93 +85,113 @@ export default function RoutesPage({ setPage, PAGES }) {
     setPage(PAGES.ROUTE);
   }
 
-  return (
-    <main className="routes-page">
-      <div className="routes-page__content">
-        <header className="routes-page__header">
-          <button type="button" className="routes-page__change-city" onClick={goToCities}>
-            ← Сменить город
-          </button>
-          <h1>{selectedCity ? `Маршруты - ${selectedCity.city}` : 'Выберите маршрут'}</h1>
-          <p>Найдите идею для прогулки и отправляйтесь открывать город.</p>
-        </header>
+    return (
+      <main className="routes-page">
+        <div className="routes-page__content">
+          <header className="routes-page__header">
+            <div className="routes-page__nav">
+              <button
+                type="button"
+                className="routes-page__change-city"
+                onClick={goToCities}
+              >
+                ← Сменить город
+              </button>
+              <button
+                type="button"
+                className="routes-page__change-city"
+                onClick={goToUserRoutes}
+              >
+                Мои маршруты
+              </button>
+            </div>
 
-        <div className="routes-page__sort" role="group" aria-label="Сортировка маршрутов">
-          {SORTS.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              className={`routes-page__sort-button ${sort === value ? 'routes-page__sort-button--active' : ''}`}
-              aria-pressed={sort === value}
-              onClick={() => changeSort(value)}
-            >
-              {label}
-            </button>
-          ))}
+            <h1>{selectedCity ? `Маршруты - ${selectedCity.city}` : 'Выберите маршрут'}</h1>
+            <p>Найдите идею для прогулки и отправляйтесь открывать город.</p>
+          </header>
+
+          <div className="routes-page__sort" role="group" aria-label="Сортировка маршрутов">
+            {SORTS.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                className={`routes-page__sort-button ${sort === value ? 'routes-page__sort-button--active' : ''}`}
+                aria-pressed={sort === value}
+                onClick={() => changeSort(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {loadError && (
+            <div className="routes-page__error" role="alert">
+              <p>{loadError}</p>
+              <button
+                type="button"
+                className="routes-page__page-button"
+                onClick={() => setAttempt(attempt + 1)}
+              >
+                Повторить
+              </button>
+            </div>
+          )}
+
+          {isLoading && !loadError && (
+            <p className="routes-page__status" role="status">Загружаем маршруты...</p>
+          )}
+
+          {routes.length > 0 ? (
+            <ul className="routes-page__list" aria-label="Доступные маршруты">
+              {routes.map((route) => (
+                <li key={route.guid}>
+                  <RouteCard
+                    route={route}
+                    onOpen={openRoute}
+                    onLikeChange={(changes) => updateRoute(route.guid, changes)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            !loadError && !isLoading && (
+              <p className="routes-page__empty">Пока нет маршрутов в этом городе.</p>
+            )
+          )}
+
+          {pagesCount > 1 && (
+            <nav className="routes-page__pagination" aria-label="Страницы маршрутов">
+              <button
+                type="button"
+                className="routes-page__page-button"
+                onClick={() => setPageNumber(page - 1)}
+                disabled={page <= 1}
+              >
+                ← Назад
+              </button>
+              <span className="routes-page__page-info">
+                {page} из {pagesCount}
+              </span>
+              <button
+                type="button"
+                className="routes-page__page-button"
+                onClick={() => setPageNumber(page + 1)}
+                disabled={page >= pagesCount}
+              >
+                Вперёд →
+              </button>
+            </nav>
+          )}
         </div>
 
-        {loadError && (
-          <div className="routes-page__error" role="alert">
-            <p>{loadError}</p>
-            <button type="button" className="routes-page__page-button" onClick={() => setAttempt(attempt + 1)}>
-              Повторить
-            </button>
-          </div>
-        )}
-
-        {isLoading && !loadError && (
-          <p className="routes-page__status" role="status">Загружаем маршруты...</p>
-        )}
-
-        {routes.length > 0 ? (
-          <ul className="routes-page__list" aria-label="Доступные маршруты">
-            {routes.map((route) => (
-              <li key={route.guid}>
-                <RouteCard
-                  route={route}
-                  onOpen={openRoute}
-                  onLikeChange={(changes) => updateRoute(route.guid, changes)}
-                />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          !loadError && !isLoading && <p className="routes-page__empty">Пока нет маршрутов в этом городе.</p>
-        )}
-
-        {pagesCount > 1 && (
-          <nav className="routes-page__pagination" aria-label="Страницы маршрутов">
-            <button
-              type="button"
-              className="routes-page__page-button"
-              onClick={() => setPageNumber(page - 1)}
-              disabled={page <= 1}
-            >
-              ← Назад
-            </button>
-            <span className="routes-page__page-info">
-              {page} из {pagesCount}
-            </span>
-            <button
-              type="button"
-              className="routes-page__page-button"
-              onClick={() => setPageNumber(page + 1)}
-              disabled={page >= pagesCount}
-            >
-              Вперёд →
-            </button>
-          </nav>
-        )}
-      </div>
-
-      <button
-        type="button"
-        className="routes-page__fab"
-        aria-label="Добавить маршрут"
-        onClick={() => setPage(PAGES.CREATE_ROUTE)}
-      >
-        +
-      </button>
-    </main>
-  );
+        <button
+          type="button"
+          className="routes-page__fab"
+          aria-label="Добавить маршрут"
+          onClick={() => setPage(PAGES.CREATE_ROUTE)}
+        >
+          +
+        </button>
+      </main>
+    );
 }
