@@ -8,7 +8,7 @@ class RoutesManager extends BaseManager{
 
         this.mediator.set(this.TRIGGERS.GET_CITIES, (data) => this.triggerGetCities());
         this.mediator.set(this.TRIGGERS.GET_ROUTES, (data) => this.triggerGetRoutes(data));
-        this.mediator.set(this.TRIGGERS.GET_ROUTES_BY_AUTHOR, (data) => this.triggerGetRoutesByAuthor(data.authorId));
+        this.mediator.set(this.TRIGGERS.GET_ROUTES_BY_AUTHOR,(data) => this.triggerGetRoutesByAuthor(data));
         this.mediator.set(this.TRIGGERS.GET_ROUTE, (data) => this.triggerGetRoute(data.routeGuid, data.userId));
         this.mediator.set(this.TRIGGERS.GET_PLACES, (data) => this.triggerGetPlaces(data.routeGuid));
         this.mediator.set(this.TRIGGERS.ADD_ROUTE, (data) => this.triggerAddRoute(data.route, data.places));
