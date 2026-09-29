@@ -61,8 +61,12 @@ export default class Server {
         return response;
     }
 
-    async getUserRoutesList(userId, page){
-        return await this.request('getUserRoutesList', {user_id: userId, page})
+    async getUserRoutesList(userId, page) {
+        return await this.request('getRoutesByAuthor', {
+            author: userId,
+            user: userId,
+            page,
+        });
     }
 
     async toggleLike(routeGuid, userId) {

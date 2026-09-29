@@ -203,6 +203,34 @@ checks:
       content_type: application/json
       required_fields: [result, error.code]
       schema: "result = error, error.code = 67"
+      
+  - id: get-routes-by-author
+    required: true
+    description: Маршруты автора
+    method: GET
+    path: /getRoutesByAuthor
+    params:
+      query:
+        author: <id автора из test-data>
+        page: 1
+    role: guest
+    expected_status: [200]
+    response:
+      content_type: application/json
+      required_fields: [result, data.routes, data.pagesCount]
+
+  - id: get-routes-by-author-missing-author
+    required: true
+    description: Запрос без параметра author
+    method: GET
+    path: /getRoutesByAuthor
+    params: {}
+    role: guest
+    expected_status: [400]
+    response:
+      content_type: application/json
+      required_fields: [result, error.code]
+      schema: "result = error, error.code = 67"
 
   - id: upload-image
     required: false

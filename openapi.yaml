@@ -184,6 +184,54 @@ paths:
                           $ref: '#/components/schemas/Place'
         '400':
           $ref: '#/components/responses/BadRequest'
+  /getRoutesByAuthor:
+    get:
+      tags: [Маршруты]
+      summary: Маршруты одного автора с пагинацией
+      operationId: getRoutesByAuthor
+      security:
+        - {}
+        - maxInitData: []
+      parameters:
+        - name: author
+          in: query
+          required: true
+          description: id автора (пользователя MAX)
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [date, likes]
+        - name: user
+          in: query
+          required: false
+          description: id пользователя MAX (используется, только если BOT_TOKEN не задан)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Страница маршрутов автора
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RoutesPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
   /addRoute:
     post:
       tags: [Маршруты]
