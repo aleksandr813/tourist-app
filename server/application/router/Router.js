@@ -6,6 +6,7 @@ const {
     useChooseCityHandler,
     useAddRouteHandler,
     useGetPlacesHandler,
+    useGetRoutesByAuthorIDHandler,
     useUploadImageHandler,
     useToggleLikeHandler,
     useGetRouteHandler,
@@ -18,6 +19,7 @@ function Router({ mediator, answer, common, uploads }) {
     router.get('/chooseCity/:city', useChooseCityHandler(mediator,answer) );
     router.get('/getCities',useGetCitiesHandler(mediator, answer) );
     router.get('/getRoutes', useGetRoutesHandler(mediator, answer) );
+    router.get('/getRoutesByAuthor', useGetRoutesByAuthorIDHandler(mediator, answer));
     router.get('/getRoute', useGetRouteHandler(mediator, answer) );
     router.get('/getPlaces', useGetPlacesHandler(mediator, answer) );
     router.post('/addRoute', useAddRouteHandler(mediator, answer) );
