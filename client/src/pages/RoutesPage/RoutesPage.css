@@ -219,6 +219,12 @@
   margin-top: 32px;
 }
 
+.routes-page__nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .routes-page__page-button {
   min-height: 48px;
   padding: 12px 18px;

@@ -4,6 +4,7 @@ import RoutesPage from './RoutesPage/RoutesPage';
 import CreateRoutePage from './CreateRoutePage/CreateRoutePage';
 import EditRoutPage from './EditRoutPage/EditRoutPage';
 import RoutePage from './RoutePage/RoutePage';
+import UserRoutesPage from './UserRoutesPage/UserRoutesPages';
 
 export const PAGES = {
     START: 'START',
@@ -11,6 +12,7 @@ export const PAGES = {
     CREATE_ROUTE: 'CREATE_ROUTE',
     EDIT: 'EDIT',
     ROUTE: 'ROUTE',
+    USERROUTE: 'USERROUTE'
 };
 
 const PageManager = () => {
@@ -31,6 +33,7 @@ const PageManager = () => {
             {page === PAGES.CREATE_ROUTE && <CreateRoutePage {...props} />}
             {page === PAGES.EDIT && <EditRoutPage {...props} />}
             {page === PAGES.ROUTE && <RoutePage {...props} />}
+            {page === PAGES.USERROUTE && <UserRoutesPage {...props} />}
         </>
     );
 };
