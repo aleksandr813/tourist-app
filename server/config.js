@@ -32,6 +32,7 @@ const CONFIG = {
         TRIGGERS: {
             GET_CITIES: 'GET_CITIES',
             GET_ROUTES: 'GET_ROUTES',
+            GET_ROUTES_BY_AUTHOR: 'GET_ROUTES_BY_AUTHOR',
             GET_PLACES: 'GET_PLACES',
             ADD_ROUTE: 'ADD_ROUTE',
             TOGGLE_LIKE: 'TOGGLE_LIKE',

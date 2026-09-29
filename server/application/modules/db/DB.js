@@ -114,6 +114,10 @@ class DB {
         return await this.orm.get('likes', like);
     }
 
+    async getRoutesByAuthorID(author_id){
+        return await this.orm.all('routes',{author_id});
+    }
+    
     async addLike(like) {
         return await this.orm.upsert('likes', like);
     }
