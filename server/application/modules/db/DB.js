@@ -114,8 +114,19 @@ class DB {
         return await this.orm.get('likes', like);
     }
 
-    async getRoutesByAuthorID(author_id){
-        return await this.orm.all('routes',{author_id});
+    async getRoutesByAuthorID({ authorId, userId, sort, limit, offset }) {
+    return await this.orm.raw(
+        `${ROUTES_SELECT}
+         WHERE routes.author_id = ?
+         GROUP BY routes.guid
+         ORDER BY ${ROUTES_ORDER[sort] ?? ROUTES_ORDER.date}
+         LIMIT ? OFFSET ?`,
+        [userId, authorId, limit, offset]
+    );
+    }
+
+    async countRoutesByAuthorID(authorId){
+        return await this.orm.count('routes', { author_id: authorId });
     }
     
     async addLike(like) {

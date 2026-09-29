@@ -41,9 +41,19 @@ class RoutesManager extends BaseManager{
     }
     
     
-    triggerGetRoutesByAuthor(authorId) {
-        return this.db.getRoutesByAuthorID(authorId);
-    }
+    async triggerGetRoutesByAuthor({ authorId, userId, sort, page }) {
+    const [routes, total] = await Promise.all([
+        this.db.getRoutesByAuthorID({
+            authorId,
+            userId,
+            sort,
+            limit: this.pageSize,
+            offset: (page - 1) * this.pageSize,
+        }),
+        this.db.countRoutesByAuthorID(authorId),
+    ]);
+    return { routes, pagesCount: Math.ceil(total / this.pageSize) };
+}
         
     async triggerAddRoute(route, places) {
         const authorId = route.author_id ?? this.anonymousAuthorId;
