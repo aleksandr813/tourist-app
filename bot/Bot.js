@@ -36,17 +36,22 @@ class Bot {
         console.log('Bot started');
 
         while (true) {
-            const result = await this.request('GET', '/updates', {
-                query: { marker, timeout: this.pollingTimeout, types: this.updateTypes },
-            });
+            try {
+                const result = await this.request('GET', '/updates', {
+                    query: { marker, timeout: this.pollingTimeout, types: this.updateTypes },
+                });
 
-            if (!result) {
+                if (!result) {
+                    await wait(this.retryDelay);
+                    continue;
+                }
+
+                marker = result.marker ?? marker;
+                await Promise.all(result.updates.map((update) => this.handleUpdate(update)));
+            } catch (error) {
+                console.error('Polling failed, will retry:', error.cause?.code ?? error.message);
                 await wait(this.retryDelay);
-                continue;
             }
-
-            marker = result.marker ?? marker;
-            await Promise.all(result.updates.map((update) => this.handleUpdate(update)));
         }
     }
 
