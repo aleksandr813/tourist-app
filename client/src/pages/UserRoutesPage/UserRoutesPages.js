@@ -13,6 +13,8 @@ export default function UserRoutesPage({ setPage, PAGES }) {
   const [loadError, setLoadError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [attempt, setAttempt] = useState(0);
+  const [page, setPageNumber] = useState(store.get('userRoutesPage') ?? 1);
+  const [pagesCount, setPagesCount] = useState(0);
 
   const goBack = useCallback(() => setPage(PAGES.ROUTES), [setPage, PAGES]);
   useMaxBackButton(goBack);
@@ -24,7 +26,9 @@ export default function UserRoutesPage({ setPage, PAGES }) {
       setIsLoading(true);
       setLoadError(null);
 
-      const userRoutesPage = await server.getUserRoutesList(userId);
+      store.set('userRoutesPage', page);
+
+      const userRoutesPage = await server.getUserRoutesList(userId, page);
       if (cancelled) {
         return;
       }
@@ -36,6 +40,7 @@ export default function UserRoutesPage({ setPage, PAGES }) {
       }
 
       setRoutes(userRoutesPage.routes);
+      setPagesCount(userRoutesPage.pagesCount ?? 0);
       window.scrollTo(0, 0);
     }
 
@@ -44,7 +49,7 @@ export default function UserRoutesPage({ setPage, PAGES }) {
     return () => {
       cancelled = true;
     };
-  }, [attempt]);
+  }, [attempt, page]);
 
   function updateRoute(guid, changes) {
     setRoutes(routes.map((route) => (route.guid === guid ? { ...route, ...changes } : route)));
@@ -92,6 +97,32 @@ export default function UserRoutesPage({ setPage, PAGES }) {
           </ul>
         ) : (
           !loadError && !isLoading && <p className="routes-page__empty">Вы пока не создали ни одного маршрута.</p>
+        )}
+
+        {pagesCount > 1 && (
+          <nav className="routes-page__pagination" aria-label="Страницы моих маршрутов">
+            <button
+              type="button"
+              className="routes-page__page-button"
+              onClick={() => setPageNumber(page - 1)}
+              disabled={page <= 1}
+            >
+              ← Назад
+            </button>
+
+            <span className="routes-page__page-info">
+              {page} из {pagesCount}
+            </span>
+
+            <button
+              type="button"
+              className="routes-page__page-button"
+              onClick={() => setPageNumber(page + 1)}
+              disabled={page >= pagesCount}
+            >
+              Вперёд →
+            </button>
+          </nav>
         )}
       </div>
 
