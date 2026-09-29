@@ -61,6 +61,10 @@ export default class Server {
         return response;
     }
 
+    async getUserRoutesList(userId){
+        return await this.request('getUserRoutesList', {user_id: userId})
+    }
+
     async toggleLike(routeGuid, userId) {
         return await this.request('toggleLike', {}, {
             method: 'POST',
